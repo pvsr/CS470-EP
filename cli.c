@@ -3,6 +3,7 @@
 #include <stdio.h>
 
 #include "cli.h"
+#include "debug.h"
 
 void print_help_message() {
     puts("Usage: votecounter [OPTION]...\n"
@@ -19,6 +20,7 @@ int parse_command_line(int argc, char **argv, char **filename) {
     while (true) {
         static struct option long_options[] = {
             {"help", no_argument, 0, 'h'},
+            {"debug", no_argument, 0, 'd'},
             {"votefile", required_argument, 0, 'f'},
             {0, 0, 0, 0}
         };
@@ -32,6 +34,10 @@ int parse_command_line(int argc, char **argv, char **filename) {
         switch (opt) {
             case 'h':
                 print_help_message();
+                break;
+
+            case 'd':
+                debug = true;
                 break;
 
             case 'f':

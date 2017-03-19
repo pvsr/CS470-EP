@@ -26,14 +26,15 @@ int count_fptp(int num_cands, vote_t votes[], int num_votes) {
     }
 
     if (debug) {
-        printf("_________\n|");
+        printf("|");
         for (int i = 1; i <= num_cands; i++) {
-            printf("   %d   |", i);
+            printf("%4d   |", i);
         }
         printf("\n|");
         for (int i = 0; i < num_cands; i++) {
             printf("%4d   |", count[i]);
         }
+        puts("");
     }
 
     return max_index;
