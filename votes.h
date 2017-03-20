@@ -29,6 +29,11 @@ typedef struct candidate {
     int location;
 } cand_t;
 
+typedef struct list_candidate {
+    int votes;
+    int seats;
+} list_cand_t;
+
 typedef struct electoral_system {
     voting_method_t method;
     int winners;

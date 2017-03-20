@@ -19,7 +19,7 @@ int main(int argc, char **argv) {
     // temporary test data
     vote_t votes[500];
     cand_t cands[6];
-    electoral_system_t sys = {FPTP, 1};
+    electoral_system_t sys = {LIST, 150};
 
     for (int i = 0; i < 120; i++) {
         votes[i] = vote_create(0);
@@ -49,7 +49,7 @@ int main(int argc, char **argv) {
         cands[i] = (cand_t) {HOPEFUL, i};
     }
 
-    printf("candidate %d wins!\n", count_votes(sys, cands, 6, votes, 500));
+    count_votes(sys, cands, 6, votes, 500);
 
     return 0;
 }
