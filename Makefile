@@ -12,4 +12,4 @@ $(MAIN): $(OBJS)
 	gcc $(CFLAGS) -c $< -o $@
 
 clean:
-	rm $(OBJS) $(MAIN)
+	rm -f $(OBJS) $(MAIN)
