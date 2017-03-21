@@ -18,11 +18,11 @@ int count_fptp(int num_cands, vote_t votes[], int num_votes) {
     for (int i = 0; i < num_cands; i++) {
         // if one cand gets over 50%, they win outright
         if (count[i] > num_votes / 2) return i;
-        
+
         if (count[i] > max_votes) {
-            max_votes = count[i];  
+            max_votes = count[i];
             max_index = i;
-        } 
+        }
     }
 
     if (debug) {
@@ -41,49 +41,52 @@ int count_fptp(int num_cands, vote_t votes[], int num_votes) {
     return max_index;
 }
 
-int find_max_list(list_cand_t cands[], int num_cands) {
-    int max_votes = -1;
+int find_max(double count[], int num_cands) {
+    double max_votes = -1;
     int max_index = -1;
 
     for (int i = 0; i < num_cands; i++) {
-        if (cands[i].votes > max_votes) {
-            max_votes = cands[i].votes;  
+        if (count[i] > max_votes) {
+            max_votes = count[i];
             max_index = i;
-        } 
+        }
     }
 
+    if (debug) printf("winner is %d with %f\n", max_index, max_votes);
     return max_index;
 }
 
 void count_list(electoral_system_t vote_sys, int num_cands, vote_t votes[], int num_votes) {
-    int count[num_cands];
-    memset(count, 0, num_cands * sizeof(int));
     int max_index;
-    int seats = vote_sys.winners;
-    list_cand_t cands[num_cands];
+    int remaining_seats = vote_sys.winners;
+
+    double orig_count[num_cands];
+    double div_count[num_cands];
+    int cand_seats[num_cands];
+
+    memset(orig_count, 0, num_cands * sizeof(double));
+    memset(cand_seats, 0, num_cands * sizeof(int));
 
     for (int i = 0; i < num_votes; i++) {
-        count[votes[i].cand]++;
+        orig_count[votes[i].cand]++;
+    }
+
+    memcpy(div_count, orig_count, num_cands * sizeof(double));
+
+    while (remaining_seats > 0) {
+        max_index = find_max(div_count, num_cands);
+
+        cand_seats[max_index]++;
+        div_count[max_index] = orig_count[max_index] / (cand_seats[max_index] + 1);
+        remaining_seats--;
     }
 
     for (int i = 0; i < num_cands; i++) {
-        cands[i] = (list_cand_t) {count[i], 0};
-    }
-
-    while (seats > 0) {
-        max_index = find_max_list(cands, num_cands);
-
-        cands[max_index].votes = count[max_index] / (cands[max_index].seats + 1);
-        cands[max_index].seats++;
-        seats--;
-    }
-
-    for (int i = 0; i < num_cands; i++) {
-        printf("party %d got %d seats!\n", i, cands[i].seats);
+        printf("party %d got %d seats!\n", i, cand_seats[i]);
     }
 }
 
-int count_votes(electoral_system_t vote_sys, cand_t cands[], int num_cands, vote_t votes[], int num_votes) {
+int count_votes(electoral_system_t vote_sys, cand_t cands[] __attribute__ ((unused)), int num_cands, vote_t votes[], int num_votes) {
     switch (vote_sys.method) {
         case FPTP:
             return count_fptp(num_cands, votes, num_votes);
