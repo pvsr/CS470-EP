@@ -1,0 +1,45 @@
+- comments start with -
+- m -- voting method, one of fptp, list, etc. (default = "fptp")
+m list
+
+- s -- seats, any integer > 0 (default = 1)
+s 1000
+
+- p -- party/candidate names, implicitly indexed (default = none)
+n
+party a
+party b
+party Z
+! - close the block
+
+- n -- number of candidates, mutually exclusive with p
+
+- one of p or n is required
+
+- c -- vote counts, explicitly indexed
+- party a has 3 votes, b has 2, and Z has 4, and there are two preference votes
+c
+0:3
+2:4
+1:2
+2,0,1:1
+1,0:1
+!
+
+- v -- literal votes, mutually exclusive with counts
+- party a has 3 votes, b has 2, and Z has 4, and there are two preference votes
+v
+0
+0
+0
+1
+1
+2
+2
+2
+2
+2,0,1
+1,0
+!
+
+- one of c or v is required
