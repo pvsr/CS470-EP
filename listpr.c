@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <limits.h>
 
 #include "votes.h"
 #include "debug.h"
@@ -37,7 +38,7 @@ void count_list_high_avg(electoral_system_t vote_sys, int num_cands, vote_t vote
 }
 
 // count votes in a party list election using the largest remainder method
-void count_list_lr(electoral_system_t vote_sys, int num_cands, vote_t votes[], int num_votes) {
+void count_list_large_rem(electoral_system_t vote_sys, int num_cands, vote_t votes[], int num_votes) {
     // hare quota
     // double quota = num_votes / vote_sys.winners;
     // droop quota
@@ -83,5 +84,5 @@ void count_list_lr(electoral_system_t vote_sys, int num_cands, vote_t votes[], i
 
 // use whichever method for now
 void count_list(electoral_system_t vote_sys, int num_cands, vote_t votes[], int num_votes) {
-    count_list_lr(vote_sys, num_cands, votes, num_votes);
+    count_list_high_avg(vote_sys, num_cands, votes, num_votes);
 }
