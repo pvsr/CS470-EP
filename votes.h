@@ -43,6 +43,10 @@ typedef struct electoral_system {
 // TODO vote file format
 void read_votes(char* filename);
 
+int find_max_dbl(double count[], int num_cands);
+
+int find_max_int(int count[], int num_cands, int threshold);
+
 int count_votes(electoral_system_t method, cand_t cands[], int num_cands, vote_t votes[], int num_votes);
 
 vote_t vote_create(int cand);
