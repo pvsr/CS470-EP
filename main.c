@@ -20,7 +20,7 @@ int main(int argc, char **argv) {
     assert(parse_command_line(argc, argv, &filename, &vote_sys) == 0);
 
     if (filename != NULL) {
-        votes = read_votefile("example_votefile.vf", &vote_sys, &cand_names, &num_cands, &num_votes);
+        votes = read_votefile(filename, &vote_sys, &cand_names, &num_cands, &num_votes);
     }
     else {
         puts("no votefile provided!");
