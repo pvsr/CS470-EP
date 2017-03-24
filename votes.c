@@ -39,7 +39,7 @@ int find_max_int(int count[], int num_cands, int threshold) {
 }
 
 // count votes in an fptp election
-int count_fptp(int num_cands, vote_t votes[], int num_votes) {
+int count_fptp(int num_cands, counting_vote_t votes[], int num_votes) {
     int count[num_cands];
     memset(count, 0, num_cands * sizeof(int));
     int winner;
@@ -66,13 +66,18 @@ int count_fptp(int num_cands, vote_t votes[], int num_votes) {
     return winner;
 }
 
-int count_votes(electoral_system_t vote_sys, cand_t cands[] __attribute__ ((unused)), int num_cands, vote_t votes[], int num_votes) {
+int count_votes(electoral_system_t vote_sys, cand_t cands[] __attribute__ ((unused)), int num_cands, full_vote_t votes[], int num_votes) {
+    counting_vote_t cur_votes[num_votes];
+    for (int i = 0; i < num_votes; i++) {
+        cur_votes[i] = vote_create(votes[i]);
+    }
+
     switch (vote_sys.method) {
         case FPTP:
-            return count_fptp(num_cands, votes, num_votes);
+            return count_fptp(num_cands, cur_votes, num_votes);
         // case PREFERENTIAL:
         case LIST:
-            count_list(vote_sys, num_cands, votes, num_votes);
+            count_list(vote_sys, num_cands, cur_votes, num_votes);
             return 0;
         // case STV:
         default:
@@ -81,9 +86,9 @@ int count_votes(electoral_system_t vote_sys, cand_t cands[] __attribute__ ((unus
     }
 }
 
-vote_t vote_create(int cand) {
-    vote_t result;
-    result.cand = cand;
+counting_vote_t vote_create(full_vote_t full) {
+    counting_vote_t result;
+    result.cand = full.cands[0];
     mpq_init(result.value);
     // no need for canonicalization
     mpq_set_ui(result.value, 1, 1);

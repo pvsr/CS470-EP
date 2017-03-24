@@ -6,6 +6,6 @@
 
 voting_method_t parse_vote_sys(char* string);
 
-vote_t* read_votes(char* filename, electoral_system_t* vote_sys, char*** cand_names);
+full_vote_t* read_votefile(char* filename, electoral_system_t* vote_sys, char*** cand_names, int* num_cands, int* num_votes);
 
 #endif /* end of include guard */

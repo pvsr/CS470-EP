@@ -1,12 +1,12 @@
 - comments start with -
 - m -- voting method, one of fptp, list, etc. (default = "fptp")
-m list
+m fptp
 
 - s -- seats, any integer > 0 (default = 1)
-s 1000
+s 1
 
 - p -- party/candidate names, implicitly indexed (default = none)
-n
+p
 party a
 party b
 party Z
@@ -14,16 +14,17 @@ party Z
 
 - n -- number of candidates, mutually exclusive with p
 
-- one of p or n is required
+- one of p or n is required, and must come before c or v
 
 - c -- vote counts, explicitly indexed
+- '4 2' means 4 votes for index 2, '1 1,0' means 1 for with preferences 1,0
 - party a has 3 votes, b has 2, and Z has 4, and there are two preference votes
 c
-0:3
-2:4
-1:2
-2,0,1:1
-1,0:1
+4 2
+3 0
+2 1
+1 1,0
+1 2,0,1
 !
 
 - v -- literal votes, mutually exclusive with counts
@@ -42,4 +43,4 @@ v
 1,0
 !
 
-- one of c or v is required
+- one of c or v is required, and after either nothing more will be parsed

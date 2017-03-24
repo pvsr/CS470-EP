@@ -7,7 +7,7 @@
 #include "debug.h"
 
 // count votes in a party list election using the D'Hondt highest average method
-void count_list_high_avg(electoral_system_t vote_sys, int num_cands, vote_t votes[], int num_votes) {
+void count_list_high_avg(electoral_system_t vote_sys, int num_cands, counting_vote_t votes[], int num_votes) {
     int winner;
     int remaining_seats = vote_sys.winners;
 
@@ -38,7 +38,7 @@ void count_list_high_avg(electoral_system_t vote_sys, int num_cands, vote_t vote
 }
 
 // count votes in a party list election using the largest remainder method
-void count_list_large_rem(electoral_system_t vote_sys, int num_cands, vote_t votes[], int num_votes) {
+void count_list_large_rem(electoral_system_t vote_sys, int num_cands, counting_vote_t votes[], int num_votes) {
     // hare quota
     // double quota = num_votes / vote_sys.winners;
     // droop quota
@@ -83,6 +83,6 @@ void count_list_large_rem(electoral_system_t vote_sys, int num_cands, vote_t vot
 }
 
 // use whichever method for now
-void count_list(electoral_system_t vote_sys, int num_cands, vote_t votes[], int num_votes) {
+void count_list(electoral_system_t vote_sys, int num_cands, counting_vote_t votes[], int num_votes) {
     count_list_high_avg(vote_sys, num_cands, votes, num_votes);
 }

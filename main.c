@@ -5,54 +5,31 @@
 #include "cli.h"
 #include "debug.h"
 #include "votes.h"
+#include "io.h"
 
 bool debug = false;
 
 int main(int argc, char **argv) {
     const char* method_names[] = {"FPTP", "PREFERENTIAL", "LIST", "STV"};
     char* filename = NULL;
+    char** cand_names;
+    full_vote_t* votes;
+    int num_cands;
+    int num_votes;
     electoral_system_t vote_sys = (electoral_system_t){FPTP, 1};
     assert(parse_command_line(argc, argv, &filename, &vote_sys) == 0);
 
+    if (filename != NULL) {
+        votes = read_votefile("example_votefile.vf", &vote_sys, &cand_names, &num_cands, &num_votes);
+    }
+    else {
+        puts("no votefile provided!");
+        return 1;
+    }
+
     if (debug) printf("voting system: %d-winner %s\n", vote_sys.winners, method_names[vote_sys.method]);
 
-    if (filename != NULL) {
-        // read in votes from file
-    }
-
-    // temporary test data
-    vote_t votes[500];
-    cand_t cands[6];
-
-    for (int i = 0; i < 120; i++) {
-        votes[i] = vote_create(0);
-    }
-
-    for (int i = 0; i < 170; i++) {
-        votes[i + 120] = vote_create(1);
-    }
-
-    for (int i = 0; i < 60; i++) {
-        votes[i + 290] = vote_create(2);
-    }
-
-    for (int i = 0; i < 60; i++) {
-        votes[i + 350] = vote_create(3);
-    }
-
-    for (int i = 0; i < 60; i++) {
-        votes[i + 410] = vote_create(4);
-    }
-
-    for (int i = 0; i < 30; i++) {
-        votes[i + 470] = vote_create(5);
-    }
-
-    for (int i = 0; i < 6; i++) {
-        cands[i] = (cand_t) {HOPEFUL, i};
-    }
-
-    count_votes(vote_sys, cands, 6, votes, 500);
+    count_votes(vote_sys, NULL, num_cands, votes, num_votes);
 
     return 0;
 }

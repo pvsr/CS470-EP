@@ -6,28 +6,15 @@
 
 #include "cli.h"
 #include "debug.h"
+#include "io.h"
 
 void print_help_message() {
-    puts("Usage: votecounter [OPTION]...\n"
+    puts("Usage: votecounter [OPTION]... VOTEFILE\n"
          "Options:\n"
          "  -h --help               display this help message\n"
          "  -v --votesystem=SYSTEM  voting system\n"
          "  -s --seats=SEATS        number of seats in multiwinner systems\n"
-         "  -d --debug              show debug output\n"
-         "  -f --votefile=FILE      read votes from file");
-}
-
-void parse_vote_sys(char* string, electoral_system_t* vote_sys) {
-    if (strcmp("fptp", string) == 0) {
-        vote_sys->method = FPTP;
-    }
-    else if (strcmp("list", string) == 0) {
-        vote_sys->method = LIST;
-    }
-    else {
-        puts("invalid counting method");
-        exit(1);
-    }
+         "  -d --debug              show debug output\n");
 }
 
 int parse_command_line(int argc, char** argv, char** filename, electoral_system_t* vote_sys) {
@@ -41,13 +28,12 @@ int parse_command_line(int argc, char** argv, char** filename, electoral_system_
             {"votesystem", required_argument, 0, 'v'},
             {"seats", required_argument, 0, 's'},
             {"debug", no_argument, 0, 'd'},
-            {"votefile", required_argument, 0, 'f'},
             {0, 0, 0, 0}
         };
 
         int option_index = 0;
 
-        opt = getopt_long(argc, argv, "hvsdf", long_options, &option_index);
+        opt = getopt_long(argc, argv, "hvsd", long_options, &option_index);
 
         if (opt == -1) break;
 
@@ -57,7 +43,7 @@ int parse_command_line(int argc, char** argv, char** filename, electoral_system_
                 break;
 
             case 'v':
-                parse_vote_sys(argv[optind++], vote_sys);
+                vote_sys->method = parse_vote_sys(argv[optind++]);
                 break;
 
             case 's':
@@ -80,6 +66,8 @@ int parse_command_line(int argc, char** argv, char** filename, electoral_system_
                 return 1;
         }
     }
+
+    *filename = argv[optind++];
 
     return 0;
 }

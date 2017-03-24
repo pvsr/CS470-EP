@@ -19,10 +19,17 @@ typedef enum voting_method {
     STV // single transferable vote
 } voting_method_t;
 
-typedef struct vote {
+// a full preference vote, with all candidates
+typedef struct full_vote {
+    int* cands;
+    int num_cands;
+} full_vote_t;
+
+// a partial vote for counting, with the current candidate and value
+typedef struct counting_vote {
     int cand;
     mpq_t value;
-} vote_t;
+} counting_vote_t;
 
 typedef struct candidate {
     cand_status_t status;
@@ -39,16 +46,12 @@ typedef struct electoral_system {
     int winners;
 } electoral_system_t;
 
-// read votes from a file
-// TODO vote file format
-void read_votes(char* filename);
-
 int find_max_dbl(double count[], int num_cands);
 
 int find_max_int(int count[], int num_cands, int threshold);
 
-int count_votes(electoral_system_t method, cand_t cands[], int num_cands, vote_t votes[], int num_votes);
+int count_votes(electoral_system_t method, cand_t cands[], int num_cands, full_vote_t votes[], int num_votes);
 
-vote_t vote_create(int cand);
+counting_vote_t vote_create(full_vote_t full);
 
 #endif /* end of include guard */
