@@ -58,6 +58,7 @@ full_vote_t* parse_votes_count(FILE* f, char* str, int num_cands, int* num_votes
 
     result = malloc(*num_votes * sizeof(full_vote_t));
 
+    i = 0;
     while (true) {
         if (fscanf(f, "%d %s ", &i, str) != 2) {
             if (fgetc(f) == '!') break;
@@ -155,6 +156,11 @@ full_vote_t* read_votefile(char* filename, electoral_system_t* vote_sys, char***
     *num_votes = 0;
 
     f = fopen(filename, "r");
+
+    if (f == NULL) {
+        puts("nonexistent votefile");
+        exit(1);
+    }
 
     while (!feof(f)) {
         c = fgetc(f);

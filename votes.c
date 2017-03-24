@@ -62,7 +62,7 @@ int count_fptp(int num_cands, counting_vote_t votes[], int num_votes) {
         puts("");
     }
 
-    printf("candidate %d wins!\n", winner);
+    printf("candidate %d wins!\n", winner + 1);
     return winner;
 }
 
