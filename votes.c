@@ -65,9 +65,12 @@ int* count_fptp(int num_cands, counting_vote_t votes[], int num_votes) {
     return winner;
 }
 
-int* count_votes(electoral_system_t vote_sys, cand_t cands[] __attribute__ ((unused)), int num_cands, full_vote_t votes[], int num_votes, int* num_winners) {
-    counting_vote_t cur_votes[num_votes];
-    for (int i = 0; i < num_votes; i++) {
+int* count_votes(electoral_system_t vote_sys, cand_t cands[] __attribute__ ((unused)), int num_cands, full_vote_t votes[], uint64_t num_votes, int* num_winners) {
+    counting_vote_t* cur_votes;
+    cur_votes = malloc(num_votes * sizeof(counting_vote_t));
+    assert(cur_votes != NULL);
+
+    for (uint64_t i = 0; i < num_votes; i++) {
         cur_votes[i] = vote_create(votes[i]);
     }
 

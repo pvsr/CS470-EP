@@ -2,6 +2,7 @@
 #define _VOTES_H_
 
 // #include <gmp.h>
+#include <stdint.h>
 
 // generally only used with stv
 typedef enum cand_status {
@@ -51,7 +52,7 @@ int find_max_dbl(double count[], int num_cands);
 
 int find_max_int(int count[], int num_cands, int threshold);
 
-int* count_votes(electoral_system_t method, cand_t cands[], int num_cands, full_vote_t votes[], int num_votes, int* num_winners);
+int* count_votes(electoral_system_t vote_sys, cand_t cands[], int num_cands, full_vote_t votes[], uint64_t num_votes, int* num_winners);
 
 counting_vote_t vote_create(full_vote_t full);
 

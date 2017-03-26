@@ -37,9 +37,9 @@ int main(int argc, char **argv) {
         fputs("<tr><td>party</td>", output);
         for (int i = 0; i < num_cands; i++) {
             if (cand_names == NULL)
-                fprintf(output, "<td align=\"center\">%d</td>", i + 1);
+                fprintf(output, "<td>%d</td>", i + 1);
             else
-                fprintf(output, "<td align=\"center\">%s</td>", cand_names[i]);
+                fprintf(output, "<td>%s</td>", cand_names[i]);
         }
         fputs("</tr>", output);
     }

@@ -1,4 +1,5 @@
 #include <assert.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -28,7 +29,8 @@ voting_method_t parse_vote_sys(char* string) {
 
 full_vote_t* parse_votes_count(FILE* f, char* str, int num_cands, int* num_votes) {
     char c = '\0';
-    int i, cur_vote;
+    int i;
+    uint64_t cur_vote;
     int vote_size;
     fpos_t start_pos;
     fpos_t end_pos;
@@ -57,6 +59,7 @@ full_vote_t* parse_votes_count(FILE* f, char* str, int num_cands, int* num_votes
     assert(fsetpos(f, &start_pos) == 0);
 
     result = malloc(*num_votes * sizeof(full_vote_t));
+    assert(result != NULL);
 
     i = 0;
     while (true) {
