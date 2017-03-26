@@ -46,6 +46,7 @@ typedef struct list_candidate {
 typedef struct electoral_system {
     voting_method_t method;
     int winners;
+    int threshold;
 } electoral_system_t;
 
 int find_max_dbl(double count[], int num_cands);

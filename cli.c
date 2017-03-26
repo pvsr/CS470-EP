@@ -13,7 +13,8 @@ void print_help_message() {
          "Options:\n"
          "  -h --help               display this help message\n"
          "  -m --votemethod=METHOD  voting system (fptp, list, etc.)\n"
-         "  -s --seats=SEATS        number of seats in multiwinner systems\n"
+         "  -s --seats=NUM          number of seats in multiwinner systems\n"
+         "  -t --threshold=NUM      percent threshold to win a seat in list-pr (default 3)\n"
          "  -d --debug              show debug output\n"
          "  -p --pretty             generate pretty HTML output\n"
          "  -o --output=FILE        output location for -p");
@@ -29,6 +30,7 @@ int parse_command_line(int argc, char** argv, char** vote_file, char** output_fi
             {"help", no_argument, 0, 'h'},
             {"votemethod", required_argument, 0, 'v'},
             {"seats", required_argument, 0, 's'},
+            {"threshold", required_argument, 0, 't'},
             {"debug", no_argument, 0, 'd'},
             {"pretty", no_argument, 0, 'p'},
             {"output", required_argument, 0, 'o'},
@@ -37,7 +39,7 @@ int parse_command_line(int argc, char** argv, char** vote_file, char** output_fi
 
         int option_index = 0;
 
-        opt = getopt_long(argc, argv, "hm:s:dpo:", long_options, &option_index);
+        opt = getopt_long(argc, argv, "hm:s:t:dpo:", long_options, &option_index);
 
         if (opt == -1) break;
 
@@ -45,23 +47,21 @@ int parse_command_line(int argc, char** argv, char** vote_file, char** output_fi
             case 'm':
                 vote_sys->method = parse_vote_sys(optarg);
                 break;
-
             case 's':
                 vote_sys->winners = atoi(optarg);
                 break;
-
+            case 't':
+                vote_sys->threshold = atoi(optarg);
+                break;
             case 'd':
                 debug = true;
                 break;
-
             case 'p':
                 pretty = true;
                 break;
-
             case 'o':
                 *output_file = optarg;
                 break;
-
             case 'h':
             default:
                 print_help_message();

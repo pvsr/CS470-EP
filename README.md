@@ -16,6 +16,8 @@ of options detailed in the help flag, but some example commands are:
   to `out.html`
 * `./votecounter VOTEFILE -v list -s 80 -p -o out.html` to run an 80-seat list
   election with the same votefile
+* `./votecounter VOTEFILE -v list -s 80 -p -o out.html -t 8` to do the same with
+  an 8% threshold to get any seats
 
 ## Votefiles
 A votefile is simply a record of votes, with some other optional information.

@@ -51,6 +51,10 @@ int* count_list_high_avg(electoral_system_t vote_sys, int num_cands, counting_vo
 
     memcpy(div_count, orig_count, num_cands * sizeof(double));
 
+    for (int i = 0; i < num_cands; i++) {
+        if (100 * orig_count[i] / num_votes < vote_sys.threshold) div_count[i] = 0;
+    }
+
     while (remaining_seats > 0) {
         winner = find_max_dbl(div_count, num_cands);
 
@@ -79,7 +83,9 @@ int* count_list_large_rem(electoral_system_t vote_sys, int num_cands, counting_v
     int cur_seats;
     int winner;
     int remaining_seats = vote_sys.winners;
+    int num_votes_adjusted = num_votes;
 
+    bool failed_threshold[num_cands];
     int count[num_cands];
     int* cand_seats;
     cand_seats = malloc(num_cands * sizeof(int));
@@ -93,23 +99,33 @@ int* count_list_large_rem(electoral_system_t vote_sys, int num_cands, counting_v
     }
 
     for (int i = 0; i < num_cands; i++) {
+        failed_threshold[i] = count[i] / num_votes < vote_sys.threshold;
+        if (failed_threshold[i]) num_votes_adjusted -= count[i];
+    }
+
+    for (int i = 0; i < num_cands; i++) {
+        if (failed_threshold[i]) continue; 
+
         // TODO this method isn't working properly. why?
         // cur_seats = count[i] / quota;
-        cur_seats = count[i] * vote_sys.winners / num_votes;
+        cur_seats = count[i] * vote_sys.winners / num_votes_adjusted;
         if (debug) printf("party %d gets %d seats outright\n", i, cur_seats);
         cand_seats[i] += cur_seats;
         remaining_seats -= cur_seats;
 
         // count = count[i] % quota;
-        count[i] = count[i] * vote_sys.winners % num_votes;
+        count[i] = count[i] * vote_sys.winners % num_votes_adjusted;
     }
 
     while (remaining_seats > 0) {
         winner = find_max_int(count, num_cands, INT_MAX);
         if (debug) printf("party %d gets a remainder seat\n", winner);
-        cand_seats[winner]++;
+
+        if (!failed_threshold[winner]) {
+            cand_seats[winner]++;
+            remaining_seats--;
+        }
         count[winner] = 0;
-        remaining_seats--;
     }
     
     *num_winners = num_cands;
