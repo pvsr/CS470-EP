@@ -6,6 +6,19 @@
 #include "votes.h"
 #include "opts.h"
 
+void pretty_print_results(int cand_seats[], int num_cands) {
+    fputs("<tr>", output);
+    for (int i = 1; i <= num_cands; i++) {
+        fprintf(output, "<td align=\"center\">%d</td>", i);
+    }
+    fputs("</tr>", output);
+    fputs("<tr>", output);
+    for (int i = 0; i < num_cands; i++) {
+        fprintf(output, "<td>%d</td>", cand_seats[i]);
+    }
+    fputs("</tr>", output);
+}
+
 // count votes in a party list election using the D'Hondt highest average method
 void count_list_high_avg(electoral_system_t vote_sys, int num_cands, counting_vote_t votes[], int num_votes) {
     int winner;
@@ -35,6 +48,8 @@ void count_list_high_avg(electoral_system_t vote_sys, int num_cands, counting_vo
     for (int i = 0; i < num_cands; i++) {
         printf("party %d got %d seats!\n", i, cand_seats[i]);
     }
+
+    if (pretty) pretty_print_results(cand_seats, num_cands);
 }
 
 // count votes in a party list election using the largest remainder method
@@ -80,6 +95,8 @@ void count_list_large_rem(electoral_system_t vote_sys, int num_cands, counting_v
     for (int i = 0; i < num_cands; i++) {
         printf("party %d got %d seats!\n", i, cand_seats[i]);
     }
+
+    if (pretty) pretty_print_results(cand_seats, num_cands);
 }
 
 // use whichever method for now
