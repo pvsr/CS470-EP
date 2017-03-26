@@ -49,17 +49,32 @@ int main(int argc, char **argv) {
     winners = count_votes(vote_sys, NULL, num_cands, votes, num_votes, &num_winners);
 
     if (vote_sys.method == FPTP) {
-        if(pretty) fprintf(output, "<p>candidate %s wins!</p>", cand_names[winners[0]]);
-        printf("candidate %s wins!\n", cand_names[winners[0]]);
+        if (cand_names == NULL) {
+            if (pretty) fprintf(output, "<p>candidate %d wins!</p>", winners[0] + 1);
+            else printf("candidate %d wins!\n", winners[0] + 1);
+        }
+        else {
+            if (pretty) fprintf(output, "<p>candidate %s wins!</p>", cand_names[winners[0]]);
+            else printf("candidate %s wins!\n", cand_names[winners[0]]);
+        }
     }
     else if (vote_sys.method == LIST) {
         for (int i = 0; i < num_winners; i++) {
-            if (pretty) fprintf(output, "<p>%s got %d seats!\n</p>", cand_names[i], winners[i]);
-            printf("%s got %d seats!\n", cand_names[i], winners[i]);
+            if (cand_names == NULL) {
+                if (pretty) fprintf(output, "<p>%d got %d seats!\n</p>", i + 1, winners[i]);
+                printf("%d got %d seats!\n", i + 1, winners[i]);
+            }
+            else {
+                if (pretty) fprintf(output, "<p>%s got %d seats!\n</p>", cand_names[i], winners[i]);
+                printf("%s got %d seats!\n", cand_names[i], winners[i]);
+            }
         }
     }
 
-    fputs("</body></html>", output);
+    if (pretty) {
+        fputs("</body></html>", output);
+        fclose(output);
+    }
 
     return 0;
 }

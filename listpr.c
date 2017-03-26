@@ -25,7 +25,7 @@ int* count_list_high_avg(electoral_system_t vote_sys, int num_cands, counting_vo
     int* cand_seats;
     cand_seats = malloc(num_cands * sizeof(int));
     assert(cand_seats != NULL);
-memset(orig_count, 0, num_cands * sizeof(double)); memset(cand_seats, 0, num_cands * sizeof(int));
+    memset(orig_count, 0, num_cands * sizeof(double)); memset(cand_seats, 0, num_cands * sizeof(int));
 
     for (int i = 0; i < num_votes; i++) {
         orig_count[votes[i].cand]++;

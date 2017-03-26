@@ -61,7 +61,7 @@ int* count_fptp(int num_cands, counting_vote_t votes[], int num_votes) {
         fputs("</tr>", output);
     }
 
-    fputs("</table>", output);
+    if (pretty) fputs("</table>", output);
     return winner;
 }
 
