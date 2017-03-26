@@ -72,7 +72,9 @@ int* count_fptp(int num_cands, counting_vote_t votes[], int num_votes) {
 }
 
 int* count_votes(electoral_system_t vote_sys, cand_t cands[] __attribute__ ((unused)), int num_cands, full_vote_t votes[], uint64_t num_votes, int* num_winners) {
+    int* result;
     counting_vote_t* cur_votes;
+
     cur_votes = malloc(num_votes * sizeof(counting_vote_t));
     assert(cur_votes != NULL);
 
@@ -83,13 +85,17 @@ int* count_votes(electoral_system_t vote_sys, cand_t cands[] __attribute__ ((unu
     switch (vote_sys.method) {
         case FPTP:
             *num_winners = 1;
-            return count_fptp(num_cands, cur_votes, num_votes);
+            result = count_fptp(num_cands, cur_votes, num_votes);
+            free(cur_votes);
+            return result;
         // case PREFERENTIAL:
         case LIST:
-            return count_list(vote_sys, num_cands, cur_votes, num_votes, num_winners);
+            result = count_list(vote_sys, num_cands, cur_votes, num_votes, num_winners);
+            free(cur_votes);
+            return result;
         // case STV:
         default:
-            puts("unimplemented vote vote_sys");
+            puts("unimplemented vote method");
             exit(1);
     }
 }

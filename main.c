@@ -1,6 +1,7 @@
 #include <assert.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "cli.h"
 #include "opts.h"
@@ -79,6 +80,15 @@ int main(int argc, char **argv) {
         fputs("</body></html>\n", output);
         fclose(output);
     }
+
+    if (cand_names != NULL) {
+        for (int i = 0; i < num_cands; i++) free(cand_names[i]);
+        free(cand_names);
+    }
+
+    for (int i = 0; i < num_votes; i++) free(votes[i].cands);
+    free(votes);
+    free(winners);
 
     return 0;
 }
