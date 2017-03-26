@@ -1,7 +1,7 @@
 #ifndef _VOTES_H_
 #define _VOTES_H_
 
-#include <gmp.h>
+// #include <gmp.h>
 
 // generally only used with stv
 typedef enum cand_status {
@@ -28,7 +28,7 @@ typedef struct full_vote {
 // a partial vote for counting, with the current candidate and value
 typedef struct counting_vote {
     int cand;
-    mpq_t value;
+    // mpq_t value;
 } counting_vote_t;
 
 typedef struct candidate {
