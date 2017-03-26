@@ -5,7 +5,10 @@
 - s -- seats, any integer > 0 (default = 1)
 - s 1
 
-- m and s override command-line arguments
+- t -- threshold, any integer between 0 and 100 (default = 3)
+- t 3
+
+- m, s, and t override command-line arguments
 
 - p -- party/candidate names, implicitly indexed (default = none)
 p

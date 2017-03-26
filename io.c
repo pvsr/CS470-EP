@@ -184,7 +184,20 @@ full_vote_t* read_votefile(char* filename, electoral_system_t* vote_sys, char***
             case 's':
                 fgetc(f);
                 fscanf(f, "%d", &i);
+                if (i <= 0) {
+                    puts("invalid number of winners");
+                    exit(1);
+                }
                 vote_sys->winners = i;
+                break;
+            case 't':
+                fgetc(f);
+                fscanf(f, "%d", &i);
+                if (i > 100 || i < 0) {
+                    puts("invalid threshold");
+                    exit(1);
+                }
+                vote_sys->threshold = i;
                 break;
             case 'p':
                 *num_cands = parse_candidates(f, str, cand_names);

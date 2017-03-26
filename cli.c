@@ -22,6 +22,7 @@ void print_help_message() {
 
 int parse_command_line(int argc, char** argv, char** vote_file, char** output_file, electoral_system_t* vote_sys) {
     int opt;
+    int i;
 
     if (argv == NULL) return 1;
 
@@ -48,10 +49,20 @@ int parse_command_line(int argc, char** argv, char** vote_file, char** output_fi
                 vote_sys->method = parse_vote_sys(optarg);
                 break;
             case 's':
+                i = atoi(optarg);
+                if (i <= 0) {
+                    puts("invalid number of winners");
+                    exit(1);
+                }
                 vote_sys->winners = atoi(optarg);
                 break;
             case 't':
-                vote_sys->threshold = atoi(optarg);
+                i = atoi(optarg);
+                if (i > 100 || i < 0) {
+                    puts("invalid threshold");
+                    exit(1);
+                }
+                vote_sys->threshold = i;
                 break;
             case 'd':
                 debug = true;
