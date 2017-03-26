@@ -51,7 +51,7 @@ int find_max_dbl(double count[], int num_cands);
 
 int find_max_int(int count[], int num_cands, int threshold);
 
-int count_votes(electoral_system_t method, cand_t cands[], int num_cands, full_vote_t votes[], int num_votes);
+int* count_votes(electoral_system_t method, cand_t cands[], int num_cands, full_vote_t votes[], int num_votes, int* num_winners);
 
 counting_vote_t vote_create(full_vote_t full);
 

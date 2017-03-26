@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -39,16 +40,18 @@ int find_max_int(int count[], int num_cands, int threshold) {
 }
 
 // count votes in an fptp election
-int count_fptp(int num_cands, counting_vote_t votes[], int num_votes) {
+int* count_fptp(int num_cands, counting_vote_t votes[], int num_votes) {
     int count[num_cands];
     memset(count, 0, num_cands * sizeof(int));
-    int winner;
+    int* winner;
+    winner = malloc(sizeof(int));
+    assert(winner != NULL);
 
     for (int i = 0; i < num_votes; i++) {
         count[votes[i].cand]++;
     }
 
-    winner = find_max_int(count, num_cands, num_votes / 2);
+    *winner = find_max_int(count, num_cands, num_votes / 2);
 
     if (pretty) {
         fputs("<tr><td>votes</td>", output);
@@ -59,13 +62,10 @@ int count_fptp(int num_cands, counting_vote_t votes[], int num_votes) {
     }
 
     fputs("</table>", output);
-
-    if(pretty) fprintf(output, "<p>candidate %d wins!</p>", winner + 1);
-    printf("candidate %d wins!\n", winner + 1);
     return winner;
 }
 
-int count_votes(electoral_system_t vote_sys, cand_t cands[] __attribute__ ((unused)), int num_cands, full_vote_t votes[], int num_votes) {
+int* count_votes(electoral_system_t vote_sys, cand_t cands[] __attribute__ ((unused)), int num_cands, full_vote_t votes[], int num_votes, int* num_winners) {
     counting_vote_t cur_votes[num_votes];
     for (int i = 0; i < num_votes; i++) {
         cur_votes[i] = vote_create(votes[i]);
@@ -73,11 +73,11 @@ int count_votes(electoral_system_t vote_sys, cand_t cands[] __attribute__ ((unus
 
     switch (vote_sys.method) {
         case FPTP:
+            *num_winners = 1;
             return count_fptp(num_cands, cur_votes, num_votes);
         // case PREFERENTIAL:
         case LIST:
-            count_list(vote_sys, num_cands, cur_votes, num_votes);
-            return 0;
+            return count_list(vote_sys, num_cands, cur_votes, num_votes, num_winners);
         // case STV:
         default:
             puts("unimplemented vote vote_sys");

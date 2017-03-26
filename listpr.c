@@ -1,3 +1,4 @@
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -12,21 +13,18 @@ void pretty_print_results(int cand_seats[], int num_cands) {
         fprintf(output, "<td>%d</td>", cand_seats[i]);
     }
     fputs("</tr></table>", output);
-
-    for (int i = 0; i < num_cands; i++) {
-        if (pretty) fprintf(output, "<p>party %d got %d seats!\n</p>", i, cand_seats[i]);
-        printf("party %d got %d seats!\n", i, cand_seats[i]);
-    }
 }
 
 // count votes in a party list election using the D'Hondt highest average method
-void count_list_high_avg(electoral_system_t vote_sys, int num_cands, counting_vote_t votes[], int num_votes) {
+int* count_list_high_avg(electoral_system_t vote_sys, int num_cands, counting_vote_t votes[], int num_votes, int* num_winners) {
     int winner;
     int remaining_seats = vote_sys.winners;
 
     double orig_count[num_cands];
     double div_count[num_cands];
-    int cand_seats[num_cands];
+    int* cand_seats;
+    cand_seats = malloc(num_cands * sizeof(int));
+    assert(cand_seats != NULL);
 memset(orig_count, 0, num_cands * sizeof(double)); memset(cand_seats, 0, num_cands * sizeof(int));
 
     for (int i = 0; i < num_votes; i++) {
@@ -42,11 +40,15 @@ memset(orig_count, 0, num_cands * sizeof(double)); memset(cand_seats, 0, num_can
         div_count[winner] = orig_count[winner] / (cand_seats[winner] + 1);
         remaining_seats--;
     }
+
+    *num_winners = num_cands;
     if (pretty) pretty_print_results(cand_seats, num_cands);
+
+    return cand_seats;
 }
 
 // count votes in a party list election using the largest remainder method
-void count_list_large_rem(electoral_system_t vote_sys, int num_cands, counting_vote_t votes[], int num_votes) {
+int* count_list_large_rem(electoral_system_t vote_sys, int num_cands, counting_vote_t votes[], int num_votes, int* num_winners) {
     // hare quota
     // double quota = num_votes / vote_sys.winners;
     // droop quota
@@ -56,7 +58,9 @@ void count_list_large_rem(electoral_system_t vote_sys, int num_cands, counting_v
     int remaining_seats = vote_sys.winners;
 
     int count[num_cands];
-    int cand_seats[num_cands];
+    int* cand_seats;
+    cand_seats = malloc(num_cands * sizeof(int));
+    assert(cand_seats != NULL);
 
     memset(count, 0, num_cands * sizeof(int));
     memset(cand_seats, 0, num_cands * sizeof(int));
@@ -84,10 +88,14 @@ void count_list_large_rem(electoral_system_t vote_sys, int num_cands, counting_v
         count[winner] = 0;
         remaining_seats--;
     }
+    
+    *num_winners = num_cands;
     if (pretty) pretty_print_results(cand_seats, num_cands);
+
+    return cand_seats;
 }
 
 // use whichever method for now
-void count_list(electoral_system_t vote_sys, int num_cands, counting_vote_t votes[], int num_votes) {
-    count_list_high_avg(vote_sys, num_cands, votes, num_votes);
+int* count_list(electoral_system_t vote_sys, int num_cands, counting_vote_t votes[], int num_votes, int* num_winners) {
+    return count_list_high_avg(vote_sys, num_cands, votes, num_votes, num_winners);
 }

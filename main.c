@@ -18,6 +18,8 @@ int main(int argc, char **argv) {
     full_vote_t* votes;
     int num_cands;
     int num_votes;
+    int num_winners;
+    int* winners;
     electoral_system_t vote_sys = (electoral_system_t){FPTP, 1};
     assert(parse_command_line(argc, argv, &filename, &vote_sys) == 0);
 
@@ -44,7 +46,18 @@ int main(int argc, char **argv) {
 
     if (debug) printf("voting system: %d-winner %s\n", vote_sys.winners, method_names[vote_sys.method]);
 
-    count_votes(vote_sys, NULL, num_cands, votes, num_votes);
+    winners = count_votes(vote_sys, NULL, num_cands, votes, num_votes, &num_winners);
+
+    if (vote_sys.method == FPTP) {
+        if(pretty) fprintf(output, "<p>candidate %s wins!</p>", cand_names[winners[0]]);
+        printf("candidate %s wins!\n", cand_names[winners[0]]);
+    }
+    else if (vote_sys.method == LIST) {
+        for (int i = 0; i < num_winners; i++) {
+            if (pretty) fprintf(output, "<p>%s got %d seats!\n</p>", cand_names[i], winners[i]);
+            printf("%s got %d seats!\n", cand_names[i], winners[i]);
+        }
+    }
 
     fputs("</body></html>", output);
 
