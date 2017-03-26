@@ -28,6 +28,7 @@ typedef struct full_vote {
 // a partial vote for counting, with the current candidate and value
 typedef struct counting_vote {
     int cand;
+    int value;
     // mpq_t value;
 } counting_vote_t;
 

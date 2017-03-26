@@ -4,7 +4,7 @@
 #include <limits.h>
 
 #include "votes.h"
-#include "debug.h"
+#include "opts.h"
 
 // count votes in a party list election using the D'Hondt highest average method
 void count_list_high_avg(electoral_system_t vote_sys, int num_cands, counting_vote_t votes[], int num_votes) {

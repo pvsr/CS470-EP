@@ -3,11 +3,12 @@
 #include <stdio.h>
 
 #include "cli.h"
-#include "debug.h"
+#include "opts.h"
 #include "votes.h"
 #include "io.h"
 
 bool debug = false;
+bool pretty = false;
 
 int main(int argc, char **argv) {
     const char* method_names[] = {"FPTP", "PREFERENTIAL", "LIST", "STV"};

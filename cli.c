@@ -5,7 +5,7 @@
 #include <string.h>
 
 #include "cli.h"
-#include "debug.h"
+#include "opts.h"
 #include "io.h"
 
 void print_help_message() {
@@ -14,7 +14,8 @@ void print_help_message() {
          "  -h --help               display this help message\n"
          "  -v --votesystem=SYSTEM  voting system\n"
          "  -s --seats=SEATS        number of seats in multiwinner systems\n"
-         "  -d --debug              show debug output\n");
+         "  -d --debug              show debug output\n"
+         "  -p --pretty             generate pretty output\n");
 }
 
 int parse_command_line(int argc, char** argv, char** filename, electoral_system_t* vote_sys) {
@@ -28,12 +29,13 @@ int parse_command_line(int argc, char** argv, char** filename, electoral_system_
             {"votesystem", required_argument, 0, 'v'},
             {"seats", required_argument, 0, 's'},
             {"debug", no_argument, 0, 'd'},
+            {"pretty", no_argument, 0, 'p'},
             {0, 0, 0, 0}
         };
 
         int option_index = 0;
 
-        opt = getopt_long(argc, argv, "hvsd", long_options, &option_index);
+        opt = getopt_long(argc, argv, "hvsdp", long_options, &option_index);
 
         if (opt == -1) break;
 
@@ -59,6 +61,10 @@ int parse_command_line(int argc, char** argv, char** filename, electoral_system_
                 if (optind < argc) *filename = argv[optind++];
                 // no file
                 else print_help_message();
+                break;
+
+            case 'p':
+                pretty = true;
                 break;
 
             default:

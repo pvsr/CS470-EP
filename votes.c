@@ -3,7 +3,7 @@
 #include <string.h>
 
 #include "votes.h"
-#include "debug.h"
+#include "opts.h"
 #include "listpr.h"
 
 int find_max_dbl(double count[], int num_cands) {
@@ -89,8 +89,9 @@ int count_votes(electoral_system_t vote_sys, cand_t cands[] __attribute__ ((unus
 counting_vote_t vote_create(full_vote_t full) {
     counting_vote_t result;
     result.cand = full.cands[0];
-    mpq_init(result.value);
+    result.value = 1;
+    // mpq_init(result.value);
     // no need for canonicalization
-    mpq_set_ui(result.value, 1, 1);
+    // mpq_set_ui(result.value, 1, 1);
     return result;
 }

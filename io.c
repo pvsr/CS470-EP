@@ -4,7 +4,7 @@
 #include <string.h>
 
 #include "io.h"
-#include "debug.h"
+#include "opts.h"
 
 #define MAX_LINE 20
 #define MAX_LINE_TERM 19
