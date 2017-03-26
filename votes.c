@@ -18,7 +18,7 @@ int find_max_dbl(double count[], int num_cands) {
         }
     }
 
-    if (debug) printf("winner is %d with %f\n", max_index, max_votes);
+    if (debug) printf("max is %d with %f\n", max_index, max_votes);
     return max_index;
 }
 
@@ -35,7 +35,7 @@ int find_max_int(int count[], int num_cands, int threshold) {
         }
     }
 
-    if (debug) printf("winner is %d with %d\n", max_index, max_votes);
+    if (debug) printf("max is %d with %d\n", max_index, max_votes);
     return max_index;
 }
 

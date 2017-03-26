@@ -15,7 +15,7 @@ void print_help_message() {
          "  -v --votesystem=SYSTEM  voting system\n"
          "  -s --seats=SEATS        number of seats in multiwinner systems\n"
          "  -d --debug              show debug output\n"
-         "  -p --pretty             generate pretty output\n");
+         "  -p --pretty             generate pretty output");
 }
 
 int parse_command_line(int argc, char** argv, char** filename, electoral_system_t* vote_sys) {
@@ -40,10 +40,6 @@ int parse_command_line(int argc, char** argv, char** filename, electoral_system_
         if (opt == -1) break;
 
         switch (opt) {
-            case 'h':
-                print_help_message();
-                break;
-
             case 'v':
                 vote_sys->method = parse_vote_sys(optarg);
                 break;
@@ -60,9 +56,10 @@ int parse_command_line(int argc, char** argv, char** filename, electoral_system_
                 pretty = true;
                 break;
 
+            case 'h':
             default:
                 print_help_message();
-                return 1;
+                exit(0);
         }
     }
 
