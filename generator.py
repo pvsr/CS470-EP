@@ -3,13 +3,18 @@ import sys
 
 filename = sys.argv[1]
 cands = int(sys.argv[2])
+
 if len(sys.argv) > 3:
     minvote = int(sys.argv[3])
+else:
+    minvote = 10
 if minvote < 0:
     minvote = 10
 
 if len(sys.argv) > 4:
     maxvote = int(sys.argv[4])
+else:
+    maxvote = minvote + 1000
 if maxvote < 0 or maxvote < minvote:
     maxvote = minvote + 1000
 
