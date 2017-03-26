@@ -13,7 +13,8 @@ FILE* output;
 
 int main(int argc, char **argv) {
     const char* method_names[] = {"FPTP", "PREFERENTIAL", "LIST", "STV"};
-    char* filename = NULL;
+    char* votefile = NULL;
+    char* output_file = NULL;
     char** cand_names = NULL;
     full_vote_t* votes;
     int num_cands;
@@ -21,10 +22,10 @@ int main(int argc, char **argv) {
     int num_winners;
     int* winners;
     electoral_system_t vote_sys = (electoral_system_t){FPTP, 1};
-    assert(parse_command_line(argc, argv, &filename, &vote_sys) == 0);
+    assert(parse_command_line(argc, argv, &votefile, &output_file, &vote_sys) == 0);
 
-    if (filename != NULL) {
-        votes = read_votefile(filename, &vote_sys, &cand_names, &num_cands, &num_votes);
+    if (votefile != NULL) {
+        votes = read_votefile(votefile, &vote_sys, &cand_names, &num_cands, &num_votes);
     }
     else {
         puts("no votefile provided!");
@@ -32,8 +33,9 @@ int main(int argc, char **argv) {
     }
 
     if (pretty) {
-        output = fopen("output.html", "w");
-        fputs("<html><head><title>votecounter output</title><link rel=\"stylesheet\" type=\"text/css\" href=\"output.css\" /></head><body><table>", output);
+        if (output_file != NULL) output = fopen(output_file, "w");
+        else output = stdout;
+        fputs("<html><head><title>votecounter output</title><link rel=\"stylesheet\" type=\"text/css\" href=\"results.css\" /></head><body><table>", output);
         fputs("<tr><td>party</td>", output);
         for (int i = 0; i < num_cands; i++) {
             if (cand_names == NULL)

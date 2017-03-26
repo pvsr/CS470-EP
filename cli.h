@@ -3,6 +3,6 @@
 
 #include "votes.h"
 
-int parse_command_line(int argc, char **argv, char **filename, electoral_system_t* vote_sys);
+int parse_command_line(int argc, char **argv, char **vote_file, char** output_file, electoral_system_t* vote_sys);
 
 #endif /* end of include guard */
