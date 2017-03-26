@@ -28,7 +28,7 @@ voting_method_t parse_vote_sys(char* string) {
 }
 
 full_vote_t* parse_votes_count(FILE* f, char* str, int num_cands, int* num_votes) {
-    char c = '\0';
+    char* tmp;
     int i;
     uint64_t cur_vote;
     int vote_size;
@@ -83,9 +83,10 @@ full_vote_t* parse_votes_count(FILE* f, char* str, int num_cands, int* num_votes
         vote.num_cands = vote_size;
 
         int n = 0;
-        for (unsigned int j = 0; j < strlen(str) && n < vote_size; j++) {
-            c = str[j];
-            if (c != ',') vote.cands[n++] = c - 48;
+        tmp = strtok(str, ", ");
+        while (tmp != NULL && n < vote_size) {
+            vote.cands[n++] = atoi(tmp);
+            tmp = strtok(NULL, ", ");
         }
 
         for (int j = 0; j < i; j++, cur_vote++) {
