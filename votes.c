@@ -59,6 +59,12 @@ int* count_fptp(int num_cands, counting_vote_t votes[], int num_votes) {
             fprintf(output, "<td>%d</td>", count[i]);
         }
         fputs("</tr>", output);
+
+        fputs("<tr><td>vote %</td>", output);
+        for (int i = 0; i < num_cands; i++) {
+            fprintf(output, "<td>%.2f%%</td>", (double) 100 * count[i] / num_votes);
+        }
+        fputs("</tr>", output);
     }
 
     if (pretty) fputs("</table>", output);

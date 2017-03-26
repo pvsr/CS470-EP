@@ -7,16 +7,28 @@
 #include "votes.h"
 #include "opts.h"
 
-void pretty_print_results(int count[], int cand_seats[], int num_cands) {
+void pretty_print_results(int count[], int cand_seats[], int num_cands, int num_votes, int num_seats) {
     fputs("<tr><td>votes</td>", output);
     for (int i = 0; i < num_cands; i++) {
         fprintf(output, "<td>%d</td>", count[i]);
     }
     fputs("</tr>", output);
 
+    fputs("<tr><td>vote %</td>", output);
+    for (int i = 0; i < num_cands; i++) {
+        fprintf(output, "<td>%.2f%%</td>", (double) 100 * count[i] / num_votes);
+    }
+    fputs("</tr>", output);
+
     fputs("<tr><td>seats</td>", output);
     for (int i = 0; i < num_cands; i++) {
         fprintf(output, "<td>%d</td>", cand_seats[i]);
+    }
+    fputs("</tr>", output);
+
+    fputs("<tr><td>seat %</td>", output);
+    for (int i = 0; i < num_cands; i++) {
+        fprintf(output, "<td>%.2f%%</td>", (double) 100 * cand_seats[i] / num_seats);
     }
     fputs("</tr></table>", output);
 }
@@ -52,7 +64,7 @@ int* count_list_high_avg(electoral_system_t vote_sys, int num_cands, counting_vo
         int int_count[num_cands];
         for (int i = 0; i < num_cands; i++) int_count[i] = orig_count[i];
 
-        pretty_print_results(int_count, cand_seats, num_cands);
+        pretty_print_results(int_count, cand_seats, num_cands, num_votes, vote_sys.winners);
     }
 
     return cand_seats;
@@ -101,7 +113,7 @@ int* count_list_large_rem(electoral_system_t vote_sys, int num_cands, counting_v
     }
     
     *num_winners = num_cands;
-    if (pretty) pretty_print_results(count, cand_seats, num_cands);
+    if (pretty) pretty_print_results(count, cand_seats, num_cands, num_votes, vote_sys.winners);
 
     return cand_seats;
 }
