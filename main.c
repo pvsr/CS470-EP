@@ -9,6 +9,7 @@
 
 bool debug = false;
 bool pretty = false;
+FILE* output;
 
 int main(int argc, char **argv) {
     const char* method_names[] = {"FPTP", "PREFERENTIAL", "LIST", "STV"};
@@ -28,9 +29,16 @@ int main(int argc, char **argv) {
         return 1;
     }
 
+    if (pretty) {
+        output = fopen("output.html", "w");
+        fputs("<html><head><title>votecounter output</title><link rel=\"stylesheet\" type=\"text/css\" href=\"output.css\" /></head><body><table>", output);
+    }
+
     if (debug) printf("voting system: %d-winner %s\n", vote_sys.winners, method_names[vote_sys.method]);
 
     count_votes(vote_sys, NULL, num_cands, votes, num_votes);
+
+    fputs("</body></html>", output);
 
     return 0;
 }

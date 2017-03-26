@@ -35,7 +35,7 @@ int parse_command_line(int argc, char** argv, char** filename, electoral_system_
 
         int option_index = 0;
 
-        opt = getopt_long(argc, argv, "hvsdp", long_options, &option_index);
+        opt = getopt_long(argc, argv, "hv:s:dp", long_options, &option_index);
 
         if (opt == -1) break;
 
@@ -45,22 +45,15 @@ int parse_command_line(int argc, char** argv, char** filename, electoral_system_
                 break;
 
             case 'v':
-                vote_sys->method = parse_vote_sys(argv[optind++]);
+                vote_sys->method = parse_vote_sys(optarg);
                 break;
 
             case 's':
-                vote_sys->winners = atoi(argv[optind++]);
+                vote_sys->winners = atoi(optarg);
                 break;
 
             case 'd':
                 debug = true;
-                break;
-
-            case 'f':
-                // set file to next arg
-                if (optind < argc) *filename = argv[optind++];
-                // no file
-                else print_help_message();
                 break;
 
             case 'p':
