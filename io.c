@@ -107,6 +107,7 @@ full_vote_t* parse_votes_count(FILE* f, char* str, int num_cands, int* num_votes
 full_vote_t* parse_votes_list(FILE* f, char* str, int num_cands, int* num_votes);
 
 int parse_candidates(FILE* f, char* str, char*** cand_names) {
+    char c;
     char** names;
     int num_cands = 0;
     fpos_t start_pos;
@@ -116,8 +117,10 @@ int parse_candidates(FILE* f, char* str, char*** cand_names) {
     fgetc(f);
     assert(fgetpos(f, &start_pos) == 0);
 
-    while (fgetc(f) != '!') {
-        if (fgetc(f) == '\n') num_cands++;
+    while (true) {
+        c = fgetc(f);
+        if (c == '!') break;
+        else if (c == '\n') num_cands++;
     }
 
     assert(fgetpos(f, &end_pos) == 0);
