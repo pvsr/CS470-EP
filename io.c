@@ -7,8 +7,8 @@
 #include "io.h"
 #include "opts.h"
 
-#define MAX_LINE 20
-#define MAX_LINE_TERM 19
+#define MAX_LINE 40
+#define MAX_LINE_TERM 39
 
 // from stackoverflow.com/questions/25410690/scanf-variable-length-specifier
 #define EXPAND2(x) #x

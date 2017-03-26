@@ -1,16 +1,17 @@
 - comments start with -
-- file argument override command-line arguments
 - m -- voting method, one of fptp, list, etc. (default = "fptp")
 - m fptp
 
 - s -- seats, any integer > 0 (default = 1)
 - s 1
 
+- m and s override command-line arguments
+
 - p -- party/candidate names, implicitly indexed (default = none)
 p
-spd
-csu
-kpd
+christian democratic party
+liberal democratic party
+social democratic party
 ! - close the block
 
 - n -- number of candidates, mutually exclusive with p
@@ -19,7 +20,7 @@ kpd
 
 - c -- vote counts, explicitly indexed
 - '4 2' means 4 votes for index 2, '1 1,0' means 1 for with preferences 1,0
-- spd has 3 votes, csu has 2, and kpd has 4, and there are two preference votes
+- cdp has 3 votes, ldp has 2, and sdp has 4, and there are two preference votes
 c
 4 2
 3 0
@@ -29,7 +30,8 @@ c
 !
 
 - v -- literal votes, mutually exclusive with counts
-- spd has 3 votes, csu has 2, and kpd has 4, and there are two preference votes
+- NOT YET IMPLEMENTED
+- cdp has 3 votes, ldp has 2, sdp has 4, and there are two preference votes
 v
 0
 0

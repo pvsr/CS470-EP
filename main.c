@@ -7,6 +7,8 @@
 #include "votes.h"
 #include "io.h"
 
+#define CSS "table,th,td {border: 1px solid black;} table {border-collapse: collapse;} th,td {padding: 15px; text-align: center;}"
+
 bool debug = false;
 bool pretty = false;
 FILE* output;
@@ -35,8 +37,8 @@ int main(int argc, char **argv) {
     if (pretty) {
         if (output_file != NULL) output = fopen(output_file, "w");
         else output = stdout;
-        fputs("<html><head><title>votecounter output</title><link rel=\"stylesheet\" type=\"text/css\" href=\"results.css\" /></head><body><table>", output);
-        fputs("<tr><td>party</td>", output);
+        fputs("<html><head><title>votecounter output</title><style>" CSS "</style></head><body><table>", output);
+        fputs("<tr><td>candidate/party</td>", output);
         for (int i = 0; i < num_cands; i++) {
             if (cand_names == NULL)
                 fprintf(output, "<td>%d</td>", i + 1);
@@ -56,25 +58,25 @@ int main(int argc, char **argv) {
             else printf("candidate %d wins!\n", winners[0] + 1);
         }
         else {
-            if (pretty) fprintf(output, "<p>candidate %s wins!</p>", cand_names[winners[0]]);
-            else printf("candidate %s wins!\n", cand_names[winners[0]]);
+            if (pretty) fprintf(output, "<p>%s wins!</p>", cand_names[winners[0]]);
+            else printf("%s wins!\n", cand_names[winners[0]]);
         }
     }
     else if (vote_sys.method == LIST) {
         for (int i = 0; i < num_winners; i++) {
             if (cand_names == NULL) {
-                if (pretty) fprintf(output, "<p>%d got %d seats!\n</p>", i + 1, winners[i]);
-                printf("%d got %d seats!\n", i + 1, winners[i]);
+                if (pretty) fprintf(output, "<p>party %d got %d seats!</p>", i + 1, winners[i]);
+                else printf("party %d got %d seats!\n", i + 1, winners[i]);
             }
             else {
-                if (pretty) fprintf(output, "<p>%s got %d seats!\n</p>", cand_names[i], winners[i]);
-                printf("%s got %d seats!\n", cand_names[i], winners[i]);
+                if (pretty) fprintf(output, "<p>%s got %d seats!</p>", cand_names[i], winners[i]);
+                else printf("%s got %d seats!\n", cand_names[i], winners[i]);
             }
         }
     }
 
     if (pretty) {
-        fputs("</body></html>", output);
+        fputs("</body></html>\n", output);
         fclose(output);
     }
 

@@ -1,4 +1,4 @@
-CFLAGS = -g -std=c99 -Wall -Wextra -lgmp
+CFLAGS = -g -std=c99 -Wall -Wextra
 SRCS = cli.c main.c votes.c listpr.c io.c
 OBJS = $(SRCS:.c=.o)
 MAIN = votecounter
