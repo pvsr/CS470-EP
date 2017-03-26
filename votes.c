@@ -51,12 +51,7 @@ int count_fptp(int num_cands, counting_vote_t votes[], int num_votes) {
     winner = find_max_int(count, num_cands, num_votes / 2);
 
     if (pretty) {
-        fputs("<tr>", output);
-        for (int i = 1; i <= num_cands; i++) {
-            fprintf(output, "<td align=\"center\">%d</td>", i);
-        }
-        fputs("</tr>", output);
-        fputs("<tr>", output);
+        fputs("<tr><td>votes</td>", output);
         for (int i = 0; i < num_cands; i++) {
             fprintf(output, "<td>%d</td>", count[i]);
         }

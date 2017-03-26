@@ -7,16 +7,16 @@
 #include "opts.h"
 
 void pretty_print_results(int cand_seats[], int num_cands) {
-    fputs("<tr>", output);
-    for (int i = 1; i <= num_cands; i++) {
-        fprintf(output, "<td align=\"center\">%d</td>", i);
-    }
-    fputs("</tr>", output);
-    fputs("<tr>", output);
+    fputs("<tr><td>seats</td>", output);
     for (int i = 0; i < num_cands; i++) {
         fprintf(output, "<td>%d</td>", cand_seats[i]);
     }
-    fputs("</tr>", output);
+    fputs("</tr></table>", output);
+
+    for (int i = 0; i < num_cands; i++) {
+        if (pretty) fprintf(output, "<p>party %d got %d seats!\n</p>", i, cand_seats[i]);
+        printf("party %d got %d seats!\n", i, cand_seats[i]);
+    }
 }
 
 // count votes in a party list election using the D'Hondt highest average method
@@ -27,9 +27,7 @@ void count_list_high_avg(electoral_system_t vote_sys, int num_cands, counting_vo
     double orig_count[num_cands];
     double div_count[num_cands];
     int cand_seats[num_cands];
-
-    memset(orig_count, 0, num_cands * sizeof(double));
-    memset(cand_seats, 0, num_cands * sizeof(int));
+memset(orig_count, 0, num_cands * sizeof(double)); memset(cand_seats, 0, num_cands * sizeof(int));
 
     for (int i = 0; i < num_votes; i++) {
         orig_count[votes[i].cand]++;
@@ -44,11 +42,6 @@ void count_list_high_avg(electoral_system_t vote_sys, int num_cands, counting_vo
         div_count[winner] = orig_count[winner] / (cand_seats[winner] + 1);
         remaining_seats--;
     }
-
-    for (int i = 0; i < num_cands; i++) {
-        printf("party %d got %d seats!\n", i, cand_seats[i]);
-    }
-
     if (pretty) pretty_print_results(cand_seats, num_cands);
 }
 
@@ -91,11 +84,6 @@ void count_list_large_rem(electoral_system_t vote_sys, int num_cands, counting_v
         count[winner] = 0;
         remaining_seats--;
     }
-
-    for (int i = 0; i < num_cands; i++) {
-        printf("party %d got %d seats!\n", i, cand_seats[i]);
-    }
-
     if (pretty) pretty_print_results(cand_seats, num_cands);
 }
 

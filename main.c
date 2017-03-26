@@ -14,7 +14,7 @@ FILE* output;
 int main(int argc, char **argv) {
     const char* method_names[] = {"FPTP", "PREFERENTIAL", "LIST", "STV"};
     char* filename = NULL;
-    char** cand_names;
+    char** cand_names = NULL;
     full_vote_t* votes;
     int num_cands;
     int num_votes;
@@ -32,6 +32,14 @@ int main(int argc, char **argv) {
     if (pretty) {
         output = fopen("output.html", "w");
         fputs("<html><head><title>votecounter output</title><link rel=\"stylesheet\" type=\"text/css\" href=\"output.css\" /></head><body><table>", output);
+        fputs("<tr><td>party</td>", output);
+        for (int i = 0; i < num_cands; i++) {
+            if (cand_names == NULL)
+                fprintf(output, "<td align=\"center\">%d</td>", i + 1);
+            else
+                fprintf(output, "<td align=\"center\">%s</td>", cand_names[i]);
+        }
+        fputs("</tr>", output);
     }
 
     if (debug) printf("voting system: %d-winner %s\n", vote_sys.winners, method_names[vote_sys.method]);
