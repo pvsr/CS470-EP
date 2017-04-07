@@ -1,9 +1,10 @@
 import random
 import sys
 import argparse
+import itertools
 
 parser = argparse.ArgumentParser(description="generate a random votefile")
-parser.add_argument("-n, --num_cands", metavar="N", type=int,
+parser.add_argument("-c, --num_cands", metavar="N", type=int,
                     dest="cands", default=6, help="number of candidates, default 6")
 parser.add_argument("-m, --min_votes", metavar="N", type=int,
                     dest="min", default=0, help="minimum number of votes, default 0")
@@ -23,7 +24,13 @@ file.write('n {0}\n\n'.format(args.cands))
 file.write('c\n')
 
 if args.pref:
-    print "uhh"
+    votes = itertools.permutations(range(0, args.cands))
+    for vote in votes:
+        num_votes = random.randrange(args.min, args.max)
+        file.write('{0} '.format(num_votes))
+        for cand in vote[:-1]:
+            file.write('{0},'.format(cand))
+        file.write('{0}\n'.format(vote[-1]))
 else:
     for i in range(0, args.cands):
         votes = random.randrange(args.min, args.max)
