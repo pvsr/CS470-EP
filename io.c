@@ -21,6 +21,9 @@ voting_method_t parse_vote_sys(char* string) {
     else if (strcmp("list", string) == 0) {
         return LIST;
     }
+    else if (strcmp("preferential", string) == 0 || strcmp("irv", string) == 0) {
+        return PREFERENTIAL;
+    }
     else {
         if (debug) printf("'%s' is an invalid counting method, using fptp\n", string);
         return FPTP;
@@ -79,6 +82,7 @@ full_vote_t* parse_votes_count(FILE* f, char* str, int num_cands, int* num_votes
         vote_size = vote_size > num_cands ? num_cands : vote_size;
 
         vote.cands = malloc(vote_size * sizeof(int));
+        vote.cur = 0;
         assert(vote.cands != NULL);
         vote.num_cands = vote_size;
 
@@ -95,6 +99,7 @@ full_vote_t* parse_votes_count(FILE* f, char* str, int num_cands, int* num_votes
 
             for (int k = 0; k < vote.num_cands; k++) 
                 result[cur_vote].cands[k] = vote.cands[k];
+            result[cur_vote].cur = 0;
             result[cur_vote].num_cands = vote.num_cands;
             assert(result[cur_vote].num_cands > 0);
         }

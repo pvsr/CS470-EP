@@ -6,6 +6,7 @@
 #include "votes.h"
 #include "opts.h"
 #include "listpr.h"
+#include "ranked.h"
 
 int find_max_dbl(double count[], int num_cands) {
     double max_votes = -1;
@@ -67,11 +68,10 @@ int* count_fptp(int num_cands, counting_vote_t votes[], int num_votes) {
         fputs("</tr>", output);
     }
 
-    if (pretty) fputs("</table>", output);
     return winner;
 }
 
-int* count_votes(electoral_system_t vote_sys, cand_t cands[] __attribute__ ((unused)), int num_cands, full_vote_t votes[], uint64_t num_votes, int* num_winners) {
+int* count_votes(electoral_system_t vote_sys, cand_t cands[] __attribute__ ((unused)), int num_cands, full_vote_t votes[], uint64_t num_votes) {
     int* result;
     counting_vote_t* cur_votes;
 
@@ -84,13 +84,14 @@ int* count_votes(electoral_system_t vote_sys, cand_t cands[] __attribute__ ((unu
 
     switch (vote_sys.method) {
         case FPTP:
-            *num_winners = 1;
             result = count_fptp(num_cands, cur_votes, num_votes);
             free(cur_votes);
             return result;
-        // case PREFERENTIAL:
+        case PREFERENTIAL:
+            free(cur_votes);
+            return count_irv(num_cands, votes, num_votes);
         case LIST:
-            result = count_list(vote_sys, num_cands, cur_votes, num_votes, num_winners);
+            result = count_list(vote_sys, num_cands, cur_votes, num_votes);
             free(cur_votes);
             return result;
         // case STV:

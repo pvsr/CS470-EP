@@ -22,7 +22,6 @@ int main(int argc, char **argv) {
     full_vote_t* votes;
     int num_cands;
     int num_votes;
-    int num_winners;
     int* winners;
     electoral_system_t vote_sys = (electoral_system_t){FPTP, 1, 3};
     assert(parse_command_line(argc, argv, &votefile, &output_file, &vote_sys) == 0);
@@ -51,9 +50,9 @@ int main(int argc, char **argv) {
 
     if (debug) printf("voting system: %d-winner %s\n", vote_sys.winners, method_names[vote_sys.method]);
 
-    winners = count_votes(vote_sys, NULL, num_cands, votes, num_votes, &num_winners);
+    winners = count_votes(vote_sys, NULL, num_cands, votes, num_votes);
 
-    if (vote_sys.method == FPTP) {
+    if (vote_sys.method == FPTP || vote_sys.method == PREFERENTIAL) {
         if (cand_names == NULL) {
             if (pretty) fprintf(output, "<p>candidate %d wins!</p>", winners[0] + 1);
             else printf("candidate %d wins!\n", winners[0] + 1);
@@ -64,7 +63,7 @@ int main(int argc, char **argv) {
         }
     }
     else if (vote_sys.method == LIST) {
-        for (int i = 0; i < num_winners; i++) {
+        for (int i = 0; i < num_cands; i++) {
             if (cand_names == NULL) {
                 if (pretty) fprintf(output, "<p>party %d got %d seats!</p>", i + 1, winners[i]);
                 else printf("party %d got %d seats!\n", i + 1, winners[i]);

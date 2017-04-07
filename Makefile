@@ -1,5 +1,5 @@
 CFLAGS = -g -std=c99 -Wall -Wextra
-SRCS = cli.c main.c votes.c listpr.c io.c
+SRCS = cli.c main.c votes.c listpr.c io.c ranked.c
 OBJS = $(SRCS:.c=.o)
 MAIN = votecounter
 

@@ -23,6 +23,7 @@ typedef enum voting_method {
 // a full preference vote, with all candidates
 typedef struct full_vote {
     int* cands;
+    int cur;
     int num_cands;
 } full_vote_t;
 
@@ -53,7 +54,7 @@ int find_max_dbl(double count[], int num_cands);
 
 int find_max_int(int count[], int num_cands, int threshold);
 
-int* count_votes(electoral_system_t vote_sys, cand_t cands[], int num_cands, full_vote_t votes[], uint64_t num_votes, int* num_winners);
+int* count_votes(electoral_system_t vote_sys, cand_t cands[], int num_cands, full_vote_t votes[], uint64_t num_votes);
 
 counting_vote_t vote_create(full_vote_t full);
 

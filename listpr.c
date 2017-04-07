@@ -34,7 +34,7 @@ void pretty_print_results(int count[], int cand_seats[], int num_cands, int num_
 }
 
 // count votes in a party list election using the D'Hondt highest average method
-int* count_list_high_avg(electoral_system_t vote_sys, int num_cands, counting_vote_t votes[], int num_votes, int* num_winners) {
+int* count_list_high_avg(electoral_system_t vote_sys, int num_cands, counting_vote_t votes[], int num_votes) {
     int winner;
     int remaining_seats = vote_sys.winners;
 
@@ -63,7 +63,6 @@ int* count_list_high_avg(electoral_system_t vote_sys, int num_cands, counting_vo
         remaining_seats--;
     }
 
-    *num_winners = num_cands;
     if (pretty) {
         int int_count[num_cands];
         for (int i = 0; i < num_cands; i++) int_count[i] = orig_count[i];
@@ -75,7 +74,7 @@ int* count_list_high_avg(electoral_system_t vote_sys, int num_cands, counting_vo
 }
 
 // count votes in a party list election using the largest remainder method
-int* count_list_large_rem(electoral_system_t vote_sys, int num_cands, counting_vote_t votes[], int num_votes, int* num_winners) {
+int* count_list_large_rem(electoral_system_t vote_sys, int num_cands, counting_vote_t votes[], int num_votes) {
     // hare quota
     // double quota = num_votes / vote_sys.winners;
     // droop quota
@@ -128,13 +127,12 @@ int* count_list_large_rem(electoral_system_t vote_sys, int num_cands, counting_v
         count[winner] = 0;
     }
     
-    *num_winners = num_cands;
     if (pretty) pretty_print_results(count, cand_seats, num_cands, num_votes, vote_sys.winners);
 
     return cand_seats;
 }
 
 // use whichever method for now
-int* count_list(electoral_system_t vote_sys, int num_cands, counting_vote_t votes[], int num_votes, int* num_winners) {
-    return count_list_high_avg(vote_sys, num_cands, votes, num_votes, num_winners);
+int* count_list(electoral_system_t vote_sys, int num_cands, counting_vote_t votes[], int num_votes) {
+    return count_list_high_avg(vote_sys, num_cands, votes, num_votes);
 }
