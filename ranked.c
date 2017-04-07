@@ -23,8 +23,9 @@ int find_min_int(int count[], int num_cands) {
 
 int* count_irv(int num_cands, full_vote_t votes[], int orig_num_votes) {
     int round = 1;
-    int loser;
     int count[num_cands];
+    int losers[num_cands - 2];
+    int loser_index = 0;
     int* winner;
     int num_votes = orig_num_votes;
 
@@ -62,24 +63,35 @@ int* count_irv(int num_cands, full_vote_t votes[], int orig_num_votes) {
         }
 
         // eliminate last place
-        loser = find_min_int(count, num_cands);
-        if (debug) printf("eliminating loser %d with %d votes\n", loser, count[loser]);
-        count[loser] = 0;
+        losers[loser_index] = find_min_int(count, num_cands);
+        if (debug) printf("eliminating loser %d with %d votes\n",
+                          losers[loser_index], count[losers[loser_index]]);
+        count[losers[loser_index]] = 0;
         for (int i = 0; i < num_votes; i++) {
             // skip non-losers
-            if (votes[i].cands[votes[i].cur] != loser) {
+            if (votes[i].cands[votes[i].cur] != losers[loser_index]) {
                 continue;
             }
+
+            votes[i].cur++;
+            for (int j = 0; j < loser_index + 1 && votes[i].cur < votes[i].num_cands; j++) {
+                if (votes[i].cands[votes[i].cur] == losers[j]) {
+                    votes[i].cur++;
+                    j = -1;
+                }
+            }
+
             // exhausted votes are thrown away
             if (votes[i].cur >= votes[i].num_cands - 1) {
                 num_votes--;
                 continue;
             }
-            votes[i].cur++;
+
             count[votes[i].cands[votes[i].cur]]++;
         }
 
         round++;
+        loser_index++;
     }
 
     /*if (pretty) {
