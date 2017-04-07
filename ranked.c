@@ -67,7 +67,7 @@ int* count_irv(int num_cands, full_vote_t votes[], int orig_num_votes) {
         count[loser] = 0;
         for (int i = 0; i < num_votes; i++) {
             // skip non-losers
-            if (votes[i].cur != loser) {
+            if (votes[i].cands[votes[i].cur] != loser) {
                 continue;
             }
             // exhausted votes are thrown away
