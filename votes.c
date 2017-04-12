@@ -8,11 +8,11 @@
 #include "listpr.h"
 #include "ranked.h"
 
-unsigned int find_max_dbl(double count[], int num_cands) {
+uint32_t find_max_dbl(double count[], uint32_t num_cands) {
     double max_votes = -1;
-    unsigned int max_index;
+    uint32_t max_index;
 
-    for (int i = 0; i < num_cands; i++) {
+    for (uint32_t i = 0; i < num_cands; i++) {
         if (count[i] > max_votes) {
             max_votes = count[i];
             max_index = i;
@@ -23,11 +23,11 @@ unsigned int find_max_dbl(double count[], int num_cands) {
     return max_index;
 }
 
-unsigned int find_max_int(unsigned int count[], int num_cands, unsigned int threshold) {
-    unsigned int max_votes = 0;
-    unsigned int max_index;
+uint32_t find_max_int(uint64_t count[], uint32_t num_cands, uint32_t threshold) {
+    uint32_t max_votes = 0;
+    uint32_t max_index;
 
-    for (int i = 0; i < num_cands; i++) {
+    for (uint32_t i = 0; i < num_cands; i++) {
         if (count[i] > threshold) return i;
 
         if (count[i] > max_votes) {
@@ -41,11 +41,11 @@ unsigned int find_max_int(unsigned int count[], int num_cands, unsigned int thre
 }
 
 // count votes in an fptp election
-unsigned int* count_fptp(int num_cands, counting_vote_t votes[], int num_votes) {
-    unsigned int count[num_cands];
-    memset(count, 0, num_cands * sizeof(int));
-    unsigned int* winner;
-    winner = malloc(sizeof(int));
+uint32_t* count_fptp(int num_cands, counting_vote_t votes[], int num_votes) {
+    uint64_t count[num_cands];
+    memset(count, 0, num_cands * sizeof(uint64_t));
+    uint32_t* winner;
+    winner = malloc(sizeof(uint32_t));
     assert(winner != NULL);
 
     for (int i = 0; i < num_votes; i++) {
@@ -57,7 +57,7 @@ unsigned int* count_fptp(int num_cands, counting_vote_t votes[], int num_votes) 
     if (pretty) {
         fputs("<tr><td>votes</td>", output);
         for (int i = 0; i < num_cands; i++) {
-            fprintf(output, "<td>%d</td>", count[i]);
+            fprintf(output, "<td>%lu</td>", count[i]);
         }
         fputs("</tr>", output);
 
@@ -71,8 +71,8 @@ unsigned int* count_fptp(int num_cands, counting_vote_t votes[], int num_votes) 
     return winner;
 }
 
-unsigned int* count_votes(electoral_system_t vote_sys, cand_t cands[] __attribute__ ((unused)), int num_cands, full_vote_t votes[], uint64_t num_votes) {
-    unsigned int* result;
+uint32_t* count_votes(electoral_system_t vote_sys, cand_t cands[] __attribute__ ((unused)), uint32_t num_cands, full_vote_t votes[], uint64_t num_votes) {
+    uint32_t* result;
     counting_vote_t* cur_votes;
 
     cur_votes = malloc(num_votes * sizeof(counting_vote_t));

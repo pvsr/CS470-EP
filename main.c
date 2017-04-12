@@ -20,9 +20,9 @@ int main(int argc, char **argv) {
     char* output_file = NULL;
     char** cand_names = NULL;
     full_vote_t* votes;
-    int num_cands;
-    int num_votes;
-    unsigned int* winners;
+    uint32_t num_cands;
+    uint64_t num_votes;
+    uint32_t* winners;
     electoral_system_t vote_sys = (electoral_system_t){FPTP, 1, 3};
     assert(parse_command_line(argc, argv, &votefile, &output_file, &vote_sys) == 0);
 
@@ -39,7 +39,7 @@ int main(int argc, char **argv) {
         else output = stdout;
         fputs("<html><head><title>votecounter output</title><style>" CSS "</style></head><body><table>", output);
         fputs("<tr><td>candidate/party</td>", output);
-        for (int i = 0; i < num_cands; i++) {
+        for (uint32_t i = 0; i < num_cands; i++) {
             if (cand_names == NULL)
                 fprintf(output, "<td>%d</td>", i + 1);
             else
@@ -63,7 +63,7 @@ int main(int argc, char **argv) {
         }
     }
     else if (vote_sys.method == LIST) {
-        for (int i = 0; i < num_cands; i++) {
+        for (uint32_t i = 0; i < num_cands; i++) {
             if (cand_names == NULL) {
                 if (pretty) fprintf(output, "<p>party %d got %d seats!</p>", i + 1, winners[i]);
                 else printf("party %d got %d seats!\n", i + 1, winners[i]);
@@ -81,11 +81,11 @@ int main(int argc, char **argv) {
     }
 
     if (cand_names != NULL) {
-        for (int i = 0; i < num_cands; i++) free(cand_names[i]);
+        for (uint32_t i = 0; i < num_cands; i++) free(cand_names[i]);
         free(cand_names);
     }
 
-    for (int i = 0; i < num_votes; i++) free(votes[i].cands);
+    for (uint32_t i = 0; i < num_votes; i++) free(votes[i].cands);
     free(votes);
     free(winners);
 

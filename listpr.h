@@ -3,6 +3,6 @@
 
 #include "votes.h"
 
-unsigned int* count_list(electoral_system_t vote_sys, int num_cands, counting_vote_t votes[], int num_votes);
+uint32_t* count_list(electoral_system_t vote_sys, uint32_t num_cands, counting_vote_t votes[], uint64_t num_votes);
 
 #endif /* end of include guard */

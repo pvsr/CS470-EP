@@ -33,11 +33,11 @@ voting_method_t parse_vote_sys(char* string) {
     }
 }
 
-full_vote_t* parse_votes_count(FILE* f, char* str, int num_cands, int* num_votes) {
+full_vote_t* parse_votes_count(FILE* f, char* str, uint32_t num_cands, uint64_t* num_votes) {
     char* tmp;
     int i;
     uint64_t cur_vote;
-    int vote_size;
+    uint32_t vote_size;
     fpos_t start_pos;
     fpos_t end_pos;
     full_vote_t* result;
@@ -78,18 +78,18 @@ full_vote_t* parse_votes_count(FILE* f, char* str, int num_cands, int* num_votes
         }
 
         vote_size = 1;
-        for (unsigned int j = 0; j < strlen(str); j++) {
+        for (uint32_t j = 0; j < strlen(str); j++) {
             if (str[j] == ',') vote_size++;
         }
 
         vote_size = vote_size > num_cands ? num_cands : vote_size;
 
-        vote.cands = malloc(vote_size * sizeof(int));
+        vote.cands = malloc(vote_size * sizeof(uint32_t));
         vote.cur = 0;
         assert(vote.cands != NULL);
         vote.num_cands = vote_size;
 
-        int n = 0;
+        uint32_t n = 0;
         tmp = strtok(str, ", ");
         while (tmp != NULL && n < vote_size) {
             vote.cands[n++] = atoi(tmp);
@@ -97,10 +97,10 @@ full_vote_t* parse_votes_count(FILE* f, char* str, int num_cands, int* num_votes
         }
 
         for (int j = 0; j < i; j++, cur_vote++) {
-            result[cur_vote].cands = malloc(vote_size * sizeof(int));
+            result[cur_vote].cands = malloc(vote_size * sizeof(uint32_t));
             assert(result[cur_vote].cands != NULL);
 
-            for (unsigned int k = 0; k < vote.num_cands; k++) 
+            for (uint32_t k = 0; k < vote.num_cands; k++)
                 result[cur_vote].cands[k] = vote.cands[k];
             result[cur_vote].cur = 0;
             result[cur_vote].num_cands = vote.num_cands;
@@ -118,12 +118,12 @@ full_vote_t* parse_votes_count(FILE* f, char* str, int num_cands, int* num_votes
     return result;
 }
 
-full_vote_t* parse_votes_list(FILE* f, char* str, int num_cands, int* num_votes);
+full_vote_t* parse_votes_list(FILE* f, char* str, uint32_t num_cands, uint32_t* num_votes);
 
-int parse_candidates(FILE* f, char* str, char*** cand_names) {
+uint32_t parse_candidates(FILE* f, char* str, char*** cand_names) {
     char c;
     char** names;
-    int num_cands = 0;
+    uint32_t num_cands = 0;
     fpos_t start_pos;
     fpos_t end_pos;
 
@@ -148,7 +148,7 @@ int parse_candidates(FILE* f, char* str, char*** cand_names) {
     names = malloc(num_cands * sizeof(char*));
     assert(names != NULL);
 
-    for (int i = 0; i < num_cands; i++) {
+    for (uint32_t i = 0; i < num_cands; i++) {
         // TODO if a name is >MAX_LINE chars, weird things will happen
         fgets(str, MAX_LINE, f);
         strtok(str, "\n");
@@ -163,7 +163,7 @@ int parse_candidates(FILE* f, char* str, char*** cand_names) {
     return num_cands;
 }
 
-full_vote_t* read_votefile(char* filename, electoral_system_t* vote_sys, char*** cand_names, int* num_cands, int* num_votes) {
+full_vote_t* read_votefile(char* filename, electoral_system_t* vote_sys, char*** cand_names, uint32_t* num_cands, uint64_t* num_votes) {
     char str[MAX_LINE];
     char c;
     int i;

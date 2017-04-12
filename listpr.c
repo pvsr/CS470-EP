@@ -7,51 +7,52 @@
 #include "votes.h"
 #include "opts.h"
 
-void pretty_print_results(int count[], unsigned int cand_seats[], int num_cands, int num_votes, int num_seats) {
+void pretty_print_results(uint64_t count[], uint32_t cand_seats[], uint32_t num_cands, uint64_t num_votes, uint32_t num_seats) {
     fputs("<tr><td>votes</td>", output);
-    for (int i = 0; i < num_cands; i++) {
-        fprintf(output, "<td>%d</td>", count[i]);
+    for (uint32_t i = 0; i < num_cands; i++) {
+        fprintf(output, "<td>%lu</td>", count[i]);
     }
     fputs("</tr>", output);
 
     fputs("<tr><td>vote %</td>", output);
-    for (int i = 0; i < num_cands; i++) {
+    for (uint32_t i = 0; i < num_cands; i++) {
         fprintf(output, "<td>%.2f%%</td>", (double) 100 * count[i] / num_votes);
     }
     fputs("</tr>", output);
 
     fputs("<tr><td>seats</td>", output);
-    for (int i = 0; i < num_cands; i++) {
+    for (uint32_t i = 0; i < num_cands; i++) {
         fprintf(output, "<td>%d</td>", cand_seats[i]);
     }
     fputs("</tr>", output);
 
     fputs("<tr><td>seat %</td>", output);
-    for (int i = 0; i < num_cands; i++) {
+    for (uint32_t i = 0; i < num_cands; i++) {
         fprintf(output, "<td>%.2f%%</td>", (double) 100 * cand_seats[i] / num_seats);
     }
     fputs("</tr></table>", output);
 }
 
 // count votes in a party list election using the D'Hondt highest average method
-unsigned int* count_list_high_avg(electoral_system_t vote_sys, int num_cands, counting_vote_t votes[], int num_votes) {
-    int winner;
-    int remaining_seats = vote_sys.winners;
+uint32_t* count_list_high_avg(electoral_system_t vote_sys, uint32_t num_cands, counting_vote_t votes[], uint64_t num_votes) {
+    uint32_t winner;
+    uint32_t remaining_seats = vote_sys.winners;
 
     double orig_count[num_cands];
     double div_count[num_cands];
-    unsigned int* cand_seats;
-    cand_seats = malloc(num_cands * sizeof(int));
+    uint32_t* cand_seats;
+    cand_seats = malloc(num_cands * sizeof(uint32_t));
     assert(cand_seats != NULL);
-    memset(orig_count, 0, num_cands * sizeof(double)); memset(cand_seats, 0, num_cands * sizeof(int));
+    memset(orig_count, 0, num_cands * sizeof(double));
+    memset(cand_seats, 0, num_cands * sizeof(uint32_t));
 
-    for (int i = 0; i < num_votes; i++) {
+    for (uint32_t i = 0; i < num_votes; i++) {
         orig_count[votes[i].cand]++;
     }
 
     memcpy(div_count, orig_count, num_cands * sizeof(double));
 
-    for (int i = 0; i < num_cands; i++) {
+    for (uint32_t i = 0; i < num_cands; i++) {
         if (100 * orig_count[i] / num_votes < vote_sys.threshold) div_count[i] = 0;
     }
 
@@ -64,8 +65,8 @@ unsigned int* count_list_high_avg(electoral_system_t vote_sys, int num_cands, co
     }
 
     if (pretty) {
-        int int_count[num_cands];
-        for (int i = 0; i < num_cands; i++) int_count[i] = orig_count[i];
+        uint64_t int_count[num_cands];
+        for (uint32_t i = 0; i < num_cands; i++) int_count[i] = orig_count[i];
 
         pretty_print_results(int_count, cand_seats, num_cands, num_votes, vote_sys.winners);
     }
@@ -74,35 +75,35 @@ unsigned int* count_list_high_avg(electoral_system_t vote_sys, int num_cands, co
 }
 
 // count votes in a party list election using the largest remainder method
-unsigned int* count_list_large_rem(electoral_system_t vote_sys, int num_cands, counting_vote_t votes[], int num_votes) {
+uint32_t* count_list_large_rem(electoral_system_t vote_sys, uint32_t num_cands, counting_vote_t votes[], uint64_t num_votes) {
     // hare quota
     // double quota = num_votes / vote_sys.winners;
     // droop quota
-    // int quota = 1 + num_votes / (1 + vote_sys.winners);
-    int cur_seats;
-    int winner;
-    int remaining_seats = vote_sys.winners;
-    int num_votes_adjusted = num_votes;
+    // uint32_t quota = 1 + num_votes / (1 + vote_sys.winners);
+    uint32_t cur_seats;
+    uint32_t winner;
+    uint32_t remaining_seats = vote_sys.winners;
+    uint32_t num_votes_adjusted = num_votes;
 
     bool failed_threshold[num_cands];
-    int count[num_cands];
-    unsigned int* cand_seats;
-    cand_seats = malloc(num_cands * sizeof(int));
+    uint64_t count[num_cands];
+    uint32_t* cand_seats;
+    cand_seats = malloc(num_cands * sizeof(uint32_t));
     assert(cand_seats != NULL);
 
-    memset(count, 0, num_cands * sizeof(int));
-    memset(cand_seats, 0, num_cands * sizeof(int));
+    memset(count, 0, num_cands * sizeof(uint64_t));
+    memset(cand_seats, 0, num_cands * sizeof(uint32_t));
 
-    for (int i = 0; i < num_votes; i++) {
+    for (uint32_t i = 0; i < num_votes; i++) {
         count[votes[i].cand]++;
     }
 
-    for (int i = 0; i < num_cands; i++) {
+    for (uint32_t i = 0; i < num_cands; i++) {
         failed_threshold[i] = count[i] / num_votes < vote_sys.threshold;
         if (failed_threshold[i]) num_votes_adjusted -= count[i];
     }
 
-    for (int i = 0; i < num_cands; i++) {
+    for (uint32_t i = 0; i < num_cands; i++) {
         if (failed_threshold[i]) continue; 
 
         // TODO this method isn't working properly. why?
@@ -133,6 +134,6 @@ unsigned int* count_list_large_rem(electoral_system_t vote_sys, int num_cands, c
 }
 
 // use whichever method for now
-unsigned int* count_list(electoral_system_t vote_sys, int num_cands, counting_vote_t votes[], int num_votes) {
+uint32_t* count_list(electoral_system_t vote_sys, uint32_t num_cands, counting_vote_t votes[], uint64_t num_votes) {
     return count_list_high_avg(vote_sys, num_cands, votes, num_votes);
 }
