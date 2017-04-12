@@ -7,7 +7,7 @@
 #include "votes.h"
 #include "opts.h"
 
-void pretty_print_results(int count[], int cand_seats[], int num_cands, int num_votes, int num_seats) {
+void pretty_print_results(int count[], unsigned int cand_seats[], int num_cands, int num_votes, int num_seats) {
     fputs("<tr><td>votes</td>", output);
     for (int i = 0; i < num_cands; i++) {
         fprintf(output, "<td>%d</td>", count[i]);
@@ -34,13 +34,13 @@ void pretty_print_results(int count[], int cand_seats[], int num_cands, int num_
 }
 
 // count votes in a party list election using the D'Hondt highest average method
-int* count_list_high_avg(electoral_system_t vote_sys, int num_cands, counting_vote_t votes[], int num_votes) {
+unsigned int* count_list_high_avg(electoral_system_t vote_sys, int num_cands, counting_vote_t votes[], int num_votes) {
     int winner;
     int remaining_seats = vote_sys.winners;
 
     double orig_count[num_cands];
     double div_count[num_cands];
-    int* cand_seats;
+    unsigned int* cand_seats;
     cand_seats = malloc(num_cands * sizeof(int));
     assert(cand_seats != NULL);
     memset(orig_count, 0, num_cands * sizeof(double)); memset(cand_seats, 0, num_cands * sizeof(int));
@@ -74,7 +74,7 @@ int* count_list_high_avg(electoral_system_t vote_sys, int num_cands, counting_vo
 }
 
 // count votes in a party list election using the largest remainder method
-int* count_list_large_rem(electoral_system_t vote_sys, int num_cands, counting_vote_t votes[], int num_votes) {
+unsigned int* count_list_large_rem(electoral_system_t vote_sys, int num_cands, counting_vote_t votes[], int num_votes) {
     // hare quota
     // double quota = num_votes / vote_sys.winners;
     // droop quota
@@ -86,7 +86,7 @@ int* count_list_large_rem(electoral_system_t vote_sys, int num_cands, counting_v
 
     bool failed_threshold[num_cands];
     int count[num_cands];
-    int* cand_seats;
+    unsigned int* cand_seats;
     cand_seats = malloc(num_cands * sizeof(int));
     assert(cand_seats != NULL);
 
@@ -133,6 +133,6 @@ int* count_list_large_rem(electoral_system_t vote_sys, int num_cands, counting_v
 }
 
 // use whichever method for now
-int* count_list(electoral_system_t vote_sys, int num_cands, counting_vote_t votes[], int num_votes) {
+unsigned int* count_list(electoral_system_t vote_sys, int num_cands, counting_vote_t votes[], int num_votes) {
     return count_list_high_avg(vote_sys, num_cands, votes, num_votes);
 }

@@ -22,7 +22,7 @@ int main(int argc, char **argv) {
     full_vote_t* votes;
     int num_cands;
     int num_votes;
-    int* winners;
+    unsigned int* winners;
     electoral_system_t vote_sys = (electoral_system_t){FPTP, 1, 3};
     assert(parse_command_line(argc, argv, &votefile, &output_file, &vote_sys) == 0);
 

@@ -1,7 +1,7 @@
 #ifndef _VOTES_H_
 #define _VOTES_H_
 
-// #include <gmp.h>
+#include <gmp.h>
 #include <stdint.h>
 
 // generally only used with stv
@@ -22,16 +22,16 @@ typedef enum voting_method {
 
 // a full preference vote, with all candidates
 typedef struct full_vote {
-    int* cands;
-    int cur;
-    int num_cands;
+    unsigned int* cands;
+    unsigned int cur;
+    unsigned int num_cands;
+    mpq_t value;
 } full_vote_t;
 
 // a partial vote for counting, with the current candidate and value
 typedef struct counting_vote {
-    int cand;
-    int value;
-    // mpq_t value;
+    unsigned int cand;
+    mpq_t value;
 } counting_vote_t;
 
 typedef struct candidate {
@@ -54,7 +54,7 @@ int find_max_dbl(double count[], int num_cands);
 
 int find_max_int(int count[], int num_cands, int threshold);
 
-int* count_votes(electoral_system_t vote_sys, cand_t cands[], int num_cands, full_vote_t votes[], uint64_t num_votes);
+unsigned int* count_votes(electoral_system_t vote_sys, cand_t cands[], int num_cands, full_vote_t votes[], uint64_t num_votes);
 
 counting_vote_t vote_create(full_vote_t full);
 

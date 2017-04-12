@@ -41,10 +41,10 @@ int find_max_int(int count[], int num_cands, int threshold) {
 }
 
 // count votes in an fptp election
-int* count_fptp(int num_cands, counting_vote_t votes[], int num_votes) {
+unsigned int* count_fptp(int num_cands, counting_vote_t votes[], int num_votes) {
     int count[num_cands];
     memset(count, 0, num_cands * sizeof(int));
-    int* winner;
+    unsigned int* winner;
     winner = malloc(sizeof(int));
     assert(winner != NULL);
 
@@ -71,8 +71,8 @@ int* count_fptp(int num_cands, counting_vote_t votes[], int num_votes) {
     return winner;
 }
 
-int* count_votes(electoral_system_t vote_sys, cand_t cands[] __attribute__ ((unused)), int num_cands, full_vote_t votes[], uint64_t num_votes) {
-    int* result;
+unsigned int* count_votes(electoral_system_t vote_sys, cand_t cands[] __attribute__ ((unused)), int num_cands, full_vote_t votes[], uint64_t num_votes) {
+    unsigned int* result;
     counting_vote_t* cur_votes;
 
     cur_votes = malloc(num_votes * sizeof(counting_vote_t));
@@ -94,7 +94,10 @@ int* count_votes(electoral_system_t vote_sys, cand_t cands[] __attribute__ ((unu
             result = count_list(vote_sys, num_cands, cur_votes, num_votes);
             free(cur_votes);
             return result;
-        // case STV:
+        case STV:
+            result = count_stv(vote_sys, num_cands, votes, num_votes);
+            free(cur_votes);
+            return result;
         default:
             puts("unimplemented vote method");
             exit(1);
@@ -104,9 +107,8 @@ int* count_votes(electoral_system_t vote_sys, cand_t cands[] __attribute__ ((unu
 counting_vote_t vote_create(full_vote_t full) {
     counting_vote_t result;
     result.cand = full.cands[0];
-    result.value = 1;
-    // mpq_init(result.value);
+    mpq_init(result.value);
     // no need for canonicalization
-    // mpq_set_ui(result.value, 1, 1);
+    mpq_set_ui(result.value, 1, 1);
     return result;
 }
