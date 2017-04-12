@@ -121,7 +121,7 @@ unsigned int* count_stv(electoral_system_t vote_sys, int num_cands, full_vote_t 
     int num_valid_votes = total_votes;
     winner_t* winners;
     int winner_index = 0;
-    int* result;
+    unsigned int* result;
     mpq_t count[num_cands];
     mpq_t exhausted;
     unsigned long int int_count[num_cands];
@@ -218,7 +218,7 @@ int find_min_int(int count[], int num_cands) {
     return min_index;
 }
 
-void count_ranked_votes(full_vote_t votes[], int total_votes, int count[], int* num_valid_votes, int losers[], int loser_index) {
+void count_ranked_votes(full_vote_t votes[], int total_votes, int count[], int* num_valid_votes, unsigned int losers[], int loser_index) {
     for (int i = 0; i < total_votes; i++) {
         // skip non-losers
         if (votes[i].cands[votes[i].cur] != losers[loser_index]) {
@@ -247,10 +247,10 @@ void count_ranked_votes(full_vote_t votes[], int total_votes, int count[], int* 
 
 unsigned int* count_irv(int num_cands, full_vote_t votes[], int total_votes) {
     int round = 1;
-    int count[num_cands];
-    int losers[num_cands - 2];
-    int loser_index = 0;
-    int* winner;
+    unsigned int count[num_cands];
+    unsigned int losers[num_cands - 2];
+    unsigned int loser_index = 0;
+    unsigned int* winner;
     int num_valid_votes = total_votes;
 
     memset(count, 0, num_cands * sizeof(int));

@@ -8,9 +8,9 @@
 #include "listpr.h"
 #include "ranked.h"
 
-int find_max_dbl(double count[], int num_cands) {
+unsigned int find_max_dbl(double count[], int num_cands) {
     double max_votes = -1;
-    int max_index;
+    unsigned int max_index;
 
     for (int i = 0; i < num_cands; i++) {
         if (count[i] > max_votes) {
@@ -23,9 +23,9 @@ int find_max_dbl(double count[], int num_cands) {
     return max_index;
 }
 
-int find_max_int(int count[], int num_cands, int threshold) {
-    int max_votes = 0;
-    int max_index;
+unsigned int find_max_int(unsigned int count[], int num_cands, unsigned int threshold) {
+    unsigned int max_votes = 0;
+    unsigned int max_index;
 
     for (int i = 0; i < num_cands; i++) {
         if (count[i] > threshold) return i;
@@ -42,7 +42,7 @@ int find_max_int(int count[], int num_cands, int threshold) {
 
 // count votes in an fptp election
 unsigned int* count_fptp(int num_cands, counting_vote_t votes[], int num_votes) {
-    int count[num_cands];
+    unsigned int count[num_cands];
     memset(count, 0, num_cands * sizeof(int));
     unsigned int* winner;
     winner = malloc(sizeof(int));

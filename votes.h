@@ -50,9 +50,9 @@ typedef struct electoral_system {
     int threshold;
 } electoral_system_t;
 
-int find_max_dbl(double count[], int num_cands);
+unsigned int find_max_dbl(double count[], int num_cands);
 
-int find_max_int(int count[], int num_cands, int threshold);
+unsigned int find_max_int(unsigned int count[], int num_cands, unsigned int threshold);
 
 unsigned int* count_votes(electoral_system_t vote_sys, cand_t cands[], int num_cands, full_vote_t votes[], uint64_t num_votes);
 
