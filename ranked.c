@@ -7,12 +7,55 @@
 #include "ranked.h"
 #include "opts.h"
 
-int cmp_winners (const void* a, const void* b)
+int cmp_eliminated (const void* a, const void* b)
 {
-    return mpq_cmp(((winner_t*)a)->votes, ((winner_t*)b)->votes);
+    eliminated_t *ae, *be;
+    ae = (eliminated_t*)a;
+    be = (eliminated_t*)b;
+
+    if (ae->won && be->won)
+        return mpq_cmp(((eliminated_t*)a)->votes, ((eliminated_t*)b)->votes);
+    else if (ae->won && !be->won)
+        return 1;
+    else if (!ae->won && be->won)
+        return -1;
+    else return 0;
 }
 
-uint32_t find_min_count_t(count_t count[], uint32_t num_cands) {
+void reset_count(full_vote_t votes[], uint64_t total_votes, eliminated_t eliminated[], uint32_t eliminated_index) {
+    // clear provisional winners
+    for (uint32_t j = 0; j < eliminated_index; j++)
+    {
+        if (eliminated[j].won)
+            mpq_clear(eliminated[j].votes);
+    }
+
+    // shift excluded candidates
+    int j = 0;
+    for (uint32_t i = 0; i < eliminated_index; i++)
+    {
+        if (!eliminated[i].won)
+        {
+            eliminated[j++] = eliminated[i];
+        }
+    }
+
+    eliminated_index = j;
+
+
+    for (uint64_t i = 0; i < total_votes; i++) {
+        // move to first valid cand
+        votes[i].cur = 0;
+        for (uint32_t j = 0; j < eliminated_index && votes[i].cur < votes[i].num_cands; j++) {
+            if (votes[i].cands[votes[i].cur] == eliminated[j].index) {
+                votes[i].cur++;
+                j = -1;
+            }
+        }
+    }
+}
+
+uint32_t find_min_count_t(count_t count[], uint32_t num_cands, eliminated_t eliminated[], uint32_t eliminated_index) {
     mpq_t min_votes;
     uint32_t min_index;
 
@@ -20,7 +63,13 @@ uint32_t find_min_count_t(count_t count[], uint32_t num_cands) {
     mpq_set_ui(min_votes, ULONG_MAX, 1);
 
     for (uint32_t i = 0; i < num_cands; i++) {
-        if (mpq_cmp(count[i].count, min_votes) < 0 && mpq_cmp_ui(count[i].count, 0, 1) > 0) {
+        bool present = false;
+        for (uint32_t j = 0; j < eliminated_index && !present; j++)
+        {
+            present = i == eliminated[j].index;
+        }
+
+        if (!present && mpq_cmp(count[i].count, min_votes) < 0 && mpq_cmp_ui(count[i].count, 0, 1) > 0) {
             mpq_set(min_votes, count[i].count);
             min_index = i;
         }
@@ -31,54 +80,76 @@ uint32_t find_min_count_t(count_t count[], uint32_t num_cands) {
     return min_index;
 }
 
-void check_for_winners(count_t count[], uint32_t num_cands, uint32_t* remaining_winners, winner_t* winners, uint32_t* winner_index, uint32_t eliminated[], uint32_t* eliminated_index, mpq_t quota) {
+void check_for_winners(uint64_t total_votes, count_t count[], uint32_t num_cands, uint32_t* remaining_winners, eliminated_t* eliminated, uint32_t* eliminated_index, mpq_t quota) {
+    static int round = 1;
+
+    if (pretty) {
+        fprintf(output, "<tr><td>round %d votes</td>", round);
+        for (uint32_t i = 0; i < num_cands; i++) {
+            fprintf(output, "<td>%.2f</td>", mpq_get_d(count[i].count));
+        }
+        fputs("</tr>", output);
+
+        if (round == 1) {
+            fputs("<tr><td>original vote %</td>", output);
+            for (uint32_t i = 0; i < num_cands; i++) {
+                fprintf(output, "<td>%.2f%%</td>", 100 * mpq_get_d(count[i].count) / total_votes);
+            }
+            fputs("</tr>", output);
+        }
+
+        round++;
+    }
+
     for (uint32_t i = 0; i < num_cands && *remaining_winners > 0; i++) {
-        // TODO don't count previous winners???
         if (!count[i].won && mpq_cmp(count[i].count, quota) >= 0)
         {
+            if (debug) printf("candidate %d passes quota %f with %f votes\n", i,
+                              mpq_get_d(quota), mpq_get_d(count[i].count));
             count[i].won = true;
-            winners[*winner_index].index = i;
-            mpq_set(winners[*winner_index].votes, count[i].count);
-            (*winner_index)++;
 
-            eliminated[*eliminated_index] = i;
+            eliminated[*eliminated_index].index = i;
+            mpq_init(eliminated[*eliminated_index].votes);
+            mpq_set(eliminated[*eliminated_index].votes, count[i].count);
+            eliminated[*eliminated_index].won = true;
             (*eliminated_index)++;
             (*remaining_winners)--;
         }
     }
 }
 
-void redistribute_surplus(full_vote_t votes[], uint32_t total_votes, count_t count[], winner_t* winners, uint32_t winner_index, uint32_t eliminated[], uint32_t eliminated_index) {
-    // loop through every vote to find votes for winners
+void redistribute_surplus(full_vote_t votes[], uint32_t total_votes, count_t count[], eliminated_t eliminated[], uint32_t eliminated_index) {
+    // loop through every vote to find votes to reassign
+    // note that we are only reassigning winners right now
     // may be a place to look for optimizations
     for (uint32_t i = 0; i < total_votes; i++) {
-        bool win = false;
+        bool won = false;
         uint32_t cand;
 
         // identify votes for winners
-        for (uint32_t j = 0; j < winner_index; j++)
+        for (uint32_t j = 0; j < eliminated_index; j++)
         {
-            win = votes[i].cands[votes[i].cur] == winners[j].index;
+            won = votes[i].cands[votes[i].cur] == eliminated[j].index && eliminated[j].won;
 
             // end loop
-            if (win) {
+            if (won) {
                 cand = j;
                 break;
             }
         }
 
         // ignore non-winning votes
-        if (!win) continue;
+        if (!won) continue;
 
         // multiply the value of a winning vote by its cand's surplus transfer value
-        mpq_mul(votes[i].value, votes[i].value, winners[cand].votes);
+        mpq_mul(votes[i].value, votes[i].value, eliminated[cand].votes);
         mpq_canonicalize(votes[i].value);
 
         // distribution of candidate's surplus votes
         // move to next valid cand
         votes[i].cur++;
-        for (uint32_t j = 0; j < eliminated_index + 1 && votes[i].cur < votes[i].num_cands; j++) {
-            if (votes[i].cands[votes[i].cur] == eliminated[j]) {
+        for (uint32_t j = 0; j < eliminated_index && votes[i].cur < votes[i].num_cands; j++) {
+            if (votes[i].cands[votes[i].cur] == eliminated[j].index) {
                 votes[i].cur++;
                 j = -1;
             }
@@ -104,43 +175,46 @@ void redistribute_surplus(full_vote_t votes[], uint32_t total_votes, count_t cou
     }
 }
 
-void handle_surplus(full_vote_t votes[], uint32_t total_votes, uint32_t num_cands, count_t count[], winner_t* winners, uint32_t winner_index, uint32_t eliminated[], uint32_t eliminated_index, mpq_t quota) {
-    // calculation of the candidate's surplus value
-    if (winner_index > 1) {
-        qsort(winners, winner_index, sizeof(winner_t), cmp_winners);
+void handle_surplus(full_vote_t votes[], uint32_t total_votes, uint32_t num_cands, count_t count[], eliminated_t eliminated[], uint32_t eliminated_index, mpq_t quota) {
+    if (eliminated_index > 1) {
+        qsort(eliminated, eliminated_index, sizeof(eliminated_t), cmp_eliminated);
     }
 
     // calculate surplus transfer value
-    for (uint32_t i = 0; i < winner_index; i++)
+    for (uint32_t i = 0; i < eliminated_index; i++)
     {
+        if (!eliminated[i].won) continue;
         // surplus value = cand's votes - quota
-        mpq_sub(winners[i].votes, count[winners[i].index].count, quota);
-        mpq_canonicalize(winners[i].votes);
+        mpq_sub(eliminated[i].votes, count[eliminated[i].index].count, quota);
+        mpq_canonicalize(eliminated[i].votes);
 
         // surplus transfer value = surplus value / cand's votes
-        mpq_div(winners[i].votes, winners[i].votes, count[winners[i].index].count);
-        mpq_canonicalize(winners[i].votes);
+        mpq_div(eliminated[i].votes, eliminated[i].votes, count[eliminated[i].index].count);
+        mpq_canonicalize(eliminated[i].votes);
     }
 
-    redistribute_surplus(votes, total_votes, count, winners, winner_index, eliminated, eliminated_index);
+    redistribute_surplus(votes, total_votes, count, eliminated, eliminated_index);
 
     // allocate quota to winners
     for (uint32_t i = 0; i < num_cands; i++)
     {
+        bool win = false;
+        for (uint32_t j = 0; j < eliminated_index && !win; j++)
+            win = i == eliminated[j].index && eliminated[j].won;
+
+        if (!win) continue;
+
         mpq_set(count[i].count, quota);
     }
 }
 
 uint32_t* count_stv(electoral_system_t vote_sys, uint32_t num_cands, full_vote_t votes[], uint64_t total_votes) {
-    // int round = 1;
-    uint32_t eliminated[num_cands];
+    eliminated_t current;
+    eliminated_t eliminated[num_cands];
     uint32_t eliminated_index = 0;
-    uint32_t exclude;
     uint32_t remaining_winners = vote_sys.winners;
     mpq_t quota;
     uint32_t num_valid_votes = total_votes;
-    winner_t winners[vote_sys.winners];
-    uint32_t winner_index = 0;
     uint32_t* result;
     count_t count[num_cands];
     uint64_t int_count[num_cands];
@@ -156,6 +230,7 @@ uint32_t* count_stv(electoral_system_t vote_sys, uint32_t num_cands, full_vote_t
     while (true) {
         memset(int_count, 0, num_cands * sizeof(uint64_t));
         memset(count, 0, num_cands * sizeof(count_t));
+        remaining_winners = vote_sys.winners;
 
         // initial distribution of preferences and calculation of quota
         for (uint32_t i = 0; i < total_votes; i++) {
@@ -168,11 +243,6 @@ uint32_t* count_stv(electoral_system_t vote_sys, uint32_t num_cands, full_vote_t
             mpq_set_ui(count[i].count, int_count[i], 1);
         }
 
-        // initialize winner counts
-        for (uint32_t i = 0; i < vote_sys.winners; i++) {
-            mpq_init(winners[i].votes);
-        }
-
         mpq_init(quota);
         // truncation is needed anyway so integer division is right
         mpq_set_ui(quota, 1 + num_valid_votes / (1 + vote_sys.winners), 1);
@@ -180,21 +250,26 @@ uint32_t* count_stv(electoral_system_t vote_sys, uint32_t num_cands, full_vote_t
         if (debug) printf("quota: %f\n", mpq_get_d(quota));
 
         // provisional declaration of elected candidates
-        check_for_winners(count, num_cands, &remaining_winners, winners, &winner_index, eliminated, &eliminated_index, quota);
+        check_for_winners(total_votes, count, num_cands, &remaining_winners, eliminated, &eliminated_index, quota);
 
         // early end
         if (remaining_winners == 0) {
             if (debug) puts("all seats filled by quota");
             break;
         }
-
-        handle_surplus(votes, total_votes, num_cands, count, winners, winner_index, eliminated, eliminated_index, quota);
-
-        check_for_winners(count, num_cands, &remaining_winners, winners, &winner_index, eliminated, &eliminated_index, quota);
+        // at least one new winner
+        else if (remaining_winners != vote_sys.winners)
+        {
+            handle_surplus(votes, total_votes, num_cands, count, eliminated, eliminated_index, quota);
+            check_for_winners(total_votes, count, num_cands, &remaining_winners, eliminated, &eliminated_index, quota);
+        }
 
         // TODO (optional) bulk exclusion
-        exclude = find_min_count_t(count, num_cands);
-        eliminated[eliminated_index++] = exclude;
+        current.index = find_min_count_t(count, num_cands, eliminated, eliminated_index);
+        current.won = false;
+        eliminated[eliminated_index] = current;
+        if (debug) printf("eliminated candidate %d\n", eliminated[eliminated_index].index);
+        eliminated_index++;
 
         // number of seats remaining == number of candidates remaining?
         if (num_cands - eliminated_index == remaining_winners)
@@ -202,22 +277,41 @@ uint32_t* count_stv(electoral_system_t vote_sys, uint32_t num_cands, full_vote_t
             if (debug) puts("remaining seats == remaining candidates");
             break;
         }
+
+        reset_count(votes, total_votes, eliminated, eliminated_index);
+
+        mpq_clear(quota);
+
+        for (uint32_t i = 0; i < num_cands; i++) {
+            mpq_clear(count[i].count);
+        }
     }
 
-    for (uint32_t i = 0; i < winner_index + 1; i++) {
-        result[i] = winners[i].index;
+    uint32_t result_idx = 0;
+    for (uint32_t i = 0; i < eliminated_index; i++) {
+        if (eliminated[i].won)
+            result[result_idx++] = eliminated[i].index;
     }
 
-    for (uint32_t i = winner_index + 1, j = 0; i < vote_sys.winners; j++)
+    // assign candidates still in play to winners
+    for (uint32_t i = 0; result_idx < vote_sys.winners && i < num_cands; i++)
     {
         bool present;
-        for (uint32_t k = 0; k < i; k++)
+        for (uint32_t j = 0; j < eliminated_index; j++)
         {
-            present = result[k] == eliminated[k];
+            present = i == eliminated[j].index;
             if (present) break;
         }
         if (present) continue;
-        result[i++] = j;
+        result[result_idx++] = i;
+    }
+
+    if (pretty) {
+        fputs("<tr><td>final vote %</td>", output);
+        for (uint32_t i = 0; i < num_cands; i++) {
+                fprintf(output, "<td>%.2f%%</td>", 100 * mpq_get_d(count[i].count) / total_votes);
+        }
+        fputs("</tr></table>", output);
     }
 
     mpq_clear(quota);
@@ -227,7 +321,8 @@ uint32_t* count_stv(electoral_system_t vote_sys, uint32_t num_cands, full_vote_t
     }
 
     for (uint32_t i = 0; i < vote_sys.winners; i++) {
-        mpq_clear(winners[i].votes);
+        if (eliminated[i].won)
+            mpq_clear(eliminated[i].votes);
     }
 
     return result;
@@ -333,9 +428,7 @@ uint32_t* count_irv(uint32_t num_cands, full_vote_t votes[], uint64_t total_vote
         for (uint32_t i = 0; i < num_cands; i++) {
             fprintf(output, "<td>%.2f%%</td>", (double) 100 * count[i] / total_votes);
         }
-        fputs("</tr>", output);
+        fputs("</tr></table>", output);
     }
-
-    fputs("</table>", output);
     return winner;
 }

@@ -74,6 +74,18 @@ int main(int argc, char **argv) {
             }
         }
     }
+    else if (vote_sys.method == STV) {
+        for (uint32_t i = 0; i < vote_sys.winners; i++) {
+            if (cand_names == NULL) {
+                if (pretty) fprintf(output, "<p>candidate %d got a seat!</p>", winners[i] + 1);
+                else printf("candidate %d got a seat!\n", winners[i] + 1);
+            }
+            else {
+                if (pretty) fprintf(output, "<p>%s got a seat!</p>", cand_names[winners[i]]);
+                else printf("%s got a seat!\n", cand_names[winners[i]]);
+            }
+        }
+    }
 
     if (pretty) {
         fputs("</body></html>\n", output);

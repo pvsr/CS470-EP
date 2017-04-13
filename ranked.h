@@ -5,10 +5,11 @@
 
 #include "votes.h"
 
-typedef struct winner {
+typedef struct eliminated {
     uint32_t index;
     mpq_t votes;
-} winner_t;
+    bool won;
+} eliminated_t;
 
 typedef struct count {
     mpq_t count;
