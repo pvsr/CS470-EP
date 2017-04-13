@@ -85,17 +85,25 @@ uint32_t* count_votes(electoral_system_t vote_sys, cand_t cands[] __attribute__ 
     switch (vote_sys.method) {
         case FPTP:
             result = count_fptp(num_cands, cur_votes, num_votes);
+            for (uint64_t i = 0; i < num_votes; i++)
+                mpq_clear(cur_votes[i].value);
             free(cur_votes);
             return result;
         case PREFERENTIAL:
+            for (uint64_t i = 0; i < num_votes; i++)
+                mpq_clear(cur_votes[i].value);
             free(cur_votes);
             return count_irv(num_cands, votes, num_votes);
         case LIST:
             result = count_list(vote_sys, num_cands, cur_votes, num_votes);
+            for (uint64_t i = 0; i < num_votes; i++)
+                mpq_clear(cur_votes[i].value);
             free(cur_votes);
             return result;
         case STV:
             result = count_stv(vote_sys, num_cands, votes, num_votes);
+            for (uint64_t i = 0; i < num_votes; i++)
+                mpq_clear(cur_votes[i].value);
             free(cur_votes);
             return result;
         default:

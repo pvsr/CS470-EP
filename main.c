@@ -86,6 +86,7 @@ int main(int argc, char **argv) {
     }
 
     for (uint32_t i = 0; i < num_votes; i++) free(votes[i].cands);
+    for (uint32_t i = 0; i < num_votes; i++) mpq_clear(votes[i].value);
     free(votes);
     free(winners);
 
