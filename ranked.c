@@ -83,24 +83,6 @@ uint32_t find_min_count_t(count_t count[], uint32_t num_cands, eliminated_t elim
 void check_for_winners(uint64_t total_votes, count_t count[], uint32_t num_cands, uint32_t* remaining_winners, eliminated_t* eliminated, uint32_t* eliminated_index, mpq_t quota) {
     static int round = 1;
 
-    if (pretty) {
-        fprintf(output, "<tr><td>round %d votes</td>", round);
-        for (uint32_t i = 0; i < num_cands; i++) {
-            fprintf(output, "<td>%.2f</td>", mpq_get_d(count[i].count));
-        }
-        fputs("</tr>", output);
-
-        if (round == 1) {
-            fputs("<tr><td>original vote %</td>", output);
-            for (uint32_t i = 0; i < num_cands; i++) {
-                fprintf(output, "<td>%.2f%%</td>", 100 * mpq_get_d(count[i].count) / total_votes);
-            }
-            fputs("</tr>", output);
-        }
-
-        round++;
-    }
-
     for (uint32_t i = 0; i < num_cands && *remaining_winners > 0; i++) {
         if (!count[i].won && mpq_cmp(count[i].count, quota) >= 0)
         {
@@ -115,6 +97,33 @@ void check_for_winners(uint64_t total_votes, count_t count[], uint32_t num_cands
             (*eliminated_index)++;
             (*remaining_winners)--;
         }
+    }
+
+    if (pretty) {
+        fprintf(output, "<tr><td>round %d votes</td>", round);
+        for (uint32_t i = 0; i < num_cands; i++) {
+            // find winners so we can bold them
+            bool won = false;
+            for (uint32_t j = 0; j < *eliminated_index && !won; j++)
+            {
+                won = i == eliminated[j].index && eliminated[j].won;
+            }
+            if (won)
+                fprintf(output, "<td><b>%.2f</b></td>", mpq_get_d(count[i].count));
+            else
+                fprintf(output, "<td>%.2f</td>", mpq_get_d(count[i].count));
+        }
+        fputs("</tr>", output);
+
+        if (round == 1) {
+            fputs("<tr><td>original vote %</td>", output);
+            for (uint32_t i = 0; i < num_cands; i++) {
+                fprintf(output, "<td>%.2f%%</td>", 100 * mpq_get_d(count[i].count) / total_votes);
+            }
+            fputs("</tr>", output);
+        }
+
+        round++;
     }
 }
 
