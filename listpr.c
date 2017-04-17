@@ -8,29 +8,29 @@
 #include "opts.h"
 
 void pretty_print_results(uint64_t count[], uint32_t cand_seats[], uint32_t num_cands, uint64_t num_votes, uint32_t num_seats) {
-    fputs("<tr><td>votes</td>", output);
+    fputs("<tr>\n<td>votes</td>\n", output);
     for (uint32_t i = 0; i < num_cands; i++) {
-        fprintf(output, "<td>%lu</td>", count[i]);
+        fprintf(output, "<td>%lu</td>\n", count[i]);
     }
-    fputs("</tr>", output);
+    fputs("</tr>\n", output);
 
-    fputs("<tr><td>vote %</td>", output);
+    fputs("<tr>\n<td>vote %</td>\n", output);
     for (uint32_t i = 0; i < num_cands; i++) {
-        fprintf(output, "<td>%.2f%%</td>", (double) 100 * count[i] / num_votes);
+        fprintf(output, "<td>%.2f%%</td>\n", (double) 100 * count[i] / num_votes);
     }
-    fputs("</tr>", output);
+    fputs("</tr>\n", output);
 
-    fputs("<tr><td>seats</td>", output);
+    fputs("<tr>\n<td>seats</td>\n", output);
     for (uint32_t i = 0; i < num_cands; i++) {
-        fprintf(output, "<td>%d</td>", cand_seats[i]);
+        fprintf(output, "<td>%d</td>\n", cand_seats[i]);
     }
-    fputs("</tr>", output);
+    fputs("</tr>\n", output);
 
-    fputs("<tr><td>seat %</td>", output);
+    fputs("<tr>\n<td>seat %</td>\n", output);
     for (uint32_t i = 0; i < num_cands; i++) {
-        fprintf(output, "<td>%.2f%%</td>", (double) 100 * cand_seats[i] / num_seats);
+        fprintf(output, "<td>%.2f%%</td>\n", (double) 100 * cand_seats[i] / num_seats);
     }
-    fputs("</tr></table>", output);
+    fputs("</tr>\n</table>\n", output);
 }
 
 // count votes in a party list election using the D'Hondt highest average method

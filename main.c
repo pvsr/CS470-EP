@@ -37,15 +37,15 @@ int main(int argc, char **argv) {
     if (pretty) {
         if (output_file != NULL) output = fopen(output_file, "w");
         else output = stdout;
-        fputs("<html><head><title>votecounter output</title><style>" CSS "</style></head><body><table>", output);
-        fputs("<tr><td>candidate/party</td>", output);
+        fputs("<html><head><title>votecounter output</title><style>" CSS "</style></head><body>\n<table>\n", output);
+        fputs("<tr>\n<td>candidate/party</td>\n", output);
         for (uint32_t i = 0; i < num_cands; i++) {
             if (cand_names == NULL)
-                fprintf(output, "<td>%d</td>", i + 1);
+                fprintf(output, "<td>%d</td>\n", i + 1);
             else
-                fprintf(output, "<td>%s</td>", cand_names[i]);
+                fprintf(output, "<td>%s</td>\n", cand_names[i]);
         }
-        fputs("</tr>", output);
+        fputs("</tr>\n", output);
     }
 
     if (debug) printf("voting system: %d-winner %s\n", vote_sys.winners, method_names[vote_sys.method]);
@@ -54,22 +54,22 @@ int main(int argc, char **argv) {
 
     if (vote_sys.method == FPTP || vote_sys.method == PREFERENTIAL) {
         if (cand_names == NULL) {
-            if (pretty) fprintf(output, "<p>candidate %d wins!</p>", winners[0] + 1);
+            if (pretty) fprintf(output, "<p>candidate %d wins!</p>\n", winners[0] + 1);
             else printf("candidate %d wins!\n", winners[0] + 1);
         }
         else {
-            if (pretty) fprintf(output, "<p>%s wins!</p>", cand_names[winners[0]]);
+            if (pretty) fprintf(output, "<p>%s wins!</p>\n", cand_names[winners[0]]);
             else printf("%s wins!\n", cand_names[winners[0]]);
         }
     }
     else if (vote_sys.method == LIST) {
         for (uint32_t i = 0; i < num_cands; i++) {
             if (cand_names == NULL) {
-                if (pretty) fprintf(output, "<p>party %d got %d seats!</p>", i + 1, winners[i]);
+                if (pretty) fprintf(output, "<p>party %d got %d seats!</p>\n", i + 1, winners[i]);
                 else printf("party %d got %d seats!\n", i + 1, winners[i]);
             }
             else {
-                if (pretty) fprintf(output, "<p>%s got %d seats!</p>", cand_names[i], winners[i]);
+                if (pretty) fprintf(output, "<p>%s got %d seats!</p>\n", cand_names[i], winners[i]);
                 else printf("%s got %d seats!\n", cand_names[i], winners[i]);
             }
         }
@@ -77,11 +77,11 @@ int main(int argc, char **argv) {
     else if (vote_sys.method == STV) {
         for (uint32_t i = 0; i < vote_sys.winners; i++) {
             if (cand_names == NULL) {
-                if (pretty) fprintf(output, "<p>candidate %d got a seat!</p>", winners[i] + 1);
+                if (pretty) fprintf(output, "<p>candidate %d got a seat!</p>\n", winners[i] + 1);
                 else printf("candidate %d got a seat!\n", winners[i] + 1);
             }
             else {
-                if (pretty) fprintf(output, "<p>%s got a seat!</p>", cand_names[winners[i]]);
+                if (pretty) fprintf(output, "<p>%s got a seat!</p>\n", cand_names[winners[i]]);
                 else printf("%s got a seat!\n", cand_names[winners[i]]);
             }
         }

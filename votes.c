@@ -55,17 +55,17 @@ uint32_t* count_fptp(int num_cands, min_vote_t votes[], int num_votes) {
     *winner = find_max_int(count, num_cands, num_votes / 2);
 
     if (pretty) {
-        fputs("<tr><td>votes</td>", output);
+        fputs("<tr>\n<td>votes</td>\n", output);
         for (int i = 0; i < num_cands; i++) {
-            fprintf(output, "<td>%lu</td>", count[i]);
+            fprintf(output, "<td>%lu</td>\n", count[i]);
         }
-        fputs("</tr>", output);
+        fputs("</tr>\n", output);
 
-        fputs("<tr><td>vote %</td>", output);
+        fputs("<tr>\n<td>vote %</td>\n", output);
         for (int i = 0; i < num_cands; i++) {
-            fprintf(output, "<td>%.2f%%</td>", (double) 100 * count[i] / num_votes);
+            fprintf(output, "<td>%.2f%%</td>\n", (double) 100 * count[i] / num_votes);
         }
-        fputs("</tr></table>", output);
+        fputs("</tr>\n</table>\n", output);
     }
 
     return winner;

@@ -100,7 +100,7 @@ void check_for_winners(uint64_t total_votes, count_t count[], uint32_t num_cands
     }
 
     if (pretty) {
-        fprintf(output, "<tr><td>round %d votes</td>", round);
+        fprintf(output, "<tr>\n<td>round %d votes</td>\n", round);
         for (uint32_t i = 0; i < num_cands; i++) {
             // find winners so we can bold them
             bool won = false;
@@ -109,18 +109,18 @@ void check_for_winners(uint64_t total_votes, count_t count[], uint32_t num_cands
                 won = i == eliminated[j].index && eliminated[j].won;
             }
             if (won)
-                fprintf(output, "<td><b>%.2f</b></td>", mpq_get_d(count[i].count));
+                fprintf(output, "<td><b>%.2f</b></td>\n", mpq_get_d(count[i].count));
             else
-                fprintf(output, "<td>%.2f</td>", mpq_get_d(count[i].count));
+                fprintf(output, "<td>%.2f</td>\n", mpq_get_d(count[i].count));
         }
         fputs("</tr>", output);
 
         if (round == 1) {
-            fputs("<tr><td>original vote %</td>", output);
+            fputs("<tr>\n<td>original vote %</td>\n", output);
             for (uint32_t i = 0; i < num_cands; i++) {
-                fprintf(output, "<td>%.2f%%</td>", 100 * mpq_get_d(count[i].count) / total_votes);
+                fprintf(output, "<td>%.2f%%</td>\n", 100 * mpq_get_d(count[i].count) / total_votes);
             }
-            fputs("</tr>", output);
+            fputs("</tr>\n", output);
         }
 
         round++;
@@ -320,11 +320,11 @@ uint32_t* count_stv(electoral_system_t vote_sys, uint32_t num_cands, full_vote_t
     }
 
     if (pretty) {
-        fputs("<tr><td>final vote %</td>", output);
+        fputs("<tr>\n<td>final vote %</td>\n", output);
         for (uint32_t i = 0; i < num_cands; i++) {
-                fprintf(output, "<td>%.2f%%</td>", 100 * mpq_get_d(count[i].count) / total_votes);
+                fprintf(output, "<td>%.2f%%</td>\n", 100 * mpq_get_d(count[i].count) / total_votes);
         }
-        fputs("</tr></table>", output);
+        fputs("</tr>\n</table>\n", output);
     }
 
     mpq_clear(quota);
@@ -401,18 +401,18 @@ uint32_t* count_irv(uint32_t num_cands, full_vote_t votes[], uint64_t total_vote
 
     while (true) {
         if (pretty) {
-            fprintf(output, "<tr><td>round %d votes</td>", round);
+            fprintf(output, "<tr>\n<td>round %d votes</td>\n", round);
             for (uint32_t i = 0; i < num_cands; i++) {
-                fprintf(output, "<td>%lu</td>", count[i]);
+                fprintf(output, "<td>%lu</td>\n", count[i]);
             }
-            fputs("</tr>", output);
+            fputs("</tr>\n", output);
 
             if (round == 1) {
-                fputs("<tr><td>original vote %</td>", output);
+                fputs("<tr>\n<td>original vote %</td>\n", output);
                 for (uint32_t i = 0; i < num_cands; i++) {
-                    fprintf(output, "<td>%.2f%%</td>", (double) 100 * count[i] / num_valid_votes);
+                    fprintf(output, "<td>%.2f%%</td>\n", (double) 100 * count[i] / num_valid_votes);
                 }
-                fputs("</tr>", output);
+                fputs("</tr>\n", output);
             }
         }
 
@@ -437,11 +437,11 @@ uint32_t* count_irv(uint32_t num_cands, full_vote_t votes[], uint64_t total_vote
     }
 
     if (pretty) {
-        fputs("<tr><td>final vote %</td>", output);
+        fputs("<tr>\n<td>final vote %</td>\n", output);
         for (uint32_t i = 0; i < num_cands; i++) {
-            fprintf(output, "<td>%.2f%%</td>", (double) 100 * count[i] / total_votes);
+            fprintf(output, "<td>%.2f%%</td>\n", (double) 100 * count[i] / total_votes);
         }
-        fputs("</tr></table>", output);
+        fputs("</tr>\n</table>\n", output);
     }
     return winner;
 }
