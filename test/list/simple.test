@@ -1,0 +1,5 @@
+../../votecounter ../simple.vf -m list -s 100 -p -o tmp.html
+diff simple.html tmp.html
+rc=$?
+rm -f tmp.html
+exit $rc
