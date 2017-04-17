@@ -41,7 +41,7 @@ uint32_t find_max_int(uint64_t count[], uint32_t num_cands, uint32_t threshold) 
 }
 
 // count votes in an fptp election
-uint32_t* count_fptp(int num_cands, counting_vote_t votes[], int num_votes) {
+uint32_t* count_fptp(int num_cands, min_vote_t votes[], int num_votes) {
     uint64_t count[num_cands];
     memset(count, 0, num_cands * sizeof(uint64_t));
     uint32_t* winner;
@@ -49,7 +49,7 @@ uint32_t* count_fptp(int num_cands, counting_vote_t votes[], int num_votes) {
     assert(winner != NULL);
 
     for (int i = 0; i < num_votes; i++) {
-        count[votes[i].cand]++;
+        count[votes[i]]++;
     }
 
     *winner = find_max_int(count, num_cands, num_votes / 2);
@@ -71,41 +71,38 @@ uint32_t* count_fptp(int num_cands, counting_vote_t votes[], int num_votes) {
     return winner;
 }
 
-uint32_t* count_votes(electoral_system_t vote_sys, cand_t cands[] __attribute__ ((unused)), uint32_t num_cands, full_vote_t votes[], uint64_t num_votes) {
+uint32_t* count_votes(electoral_system_t vote_sys, uint32_t num_cands, full_vote_t votes[], uint64_t num_votes) {
     uint32_t* result;
-    counting_vote_t* cur_votes;
+    min_vote_t* cur_votes;
 
-    cur_votes = malloc(num_votes * sizeof(counting_vote_t));
-    assert(cur_votes != NULL);
+    if (vote_sys.method == FPTP || vote_sys.method == LIST) {
+        cur_votes = malloc(num_votes * sizeof(min_vote_t));
+        assert(cur_votes != NULL);
 
-    for (uint64_t i = 0; i < num_votes; i++) {
-        cur_votes[i] = vote_create(votes[i]);
+        for (uint64_t i = 0; i < num_votes; i++) {
+            cur_votes[i] = votes[i].cands[0];
+        }
+    }
+    else {
+        for (uint64_t i = 0; i < num_votes; i++) {
+            mpq_init(votes[i].value);
+            mpq_set_ui(votes[i].value, 1, 1);
+        }
     }
 
     switch (vote_sys.method) {
         case FPTP:
             result = count_fptp(num_cands, cur_votes, num_votes);
-            for (uint64_t i = 0; i < num_votes; i++)
-                mpq_clear(cur_votes[i].value);
             free(cur_votes);
             return result;
         case PREFERENTIAL:
-            for (uint64_t i = 0; i < num_votes; i++)
-                mpq_clear(cur_votes[i].value);
-            free(cur_votes);
             return count_irv(num_cands, votes, num_votes);
         case LIST:
             result = count_list(vote_sys, num_cands, cur_votes, num_votes);
-            for (uint64_t i = 0; i < num_votes; i++)
-                mpq_clear(cur_votes[i].value);
             free(cur_votes);
             return result;
         case STV:
-            result = count_stv(vote_sys, num_cands, votes, num_votes);
-            for (uint64_t i = 0; i < num_votes; i++)
-                mpq_clear(cur_votes[i].value);
-            free(cur_votes);
-            return result;
+            return count_stv(vote_sys, num_cands, votes, num_votes);
         default:
             puts("unimplemented vote method");
             exit(1);

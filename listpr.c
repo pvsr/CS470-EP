@@ -34,7 +34,7 @@ void pretty_print_results(uint64_t count[], uint32_t cand_seats[], uint32_t num_
 }
 
 // count votes in a party list election using the D'Hondt highest average method
-uint32_t* count_list_high_avg(electoral_system_t vote_sys, uint32_t num_cands, counting_vote_t votes[], uint64_t num_votes) {
+uint32_t* count_list_high_avg(electoral_system_t vote_sys, uint32_t num_cands, min_vote_t votes[], uint64_t num_votes) {
     uint32_t winner;
     uint32_t remaining_seats = vote_sys.winners;
 
@@ -47,7 +47,7 @@ uint32_t* count_list_high_avg(electoral_system_t vote_sys, uint32_t num_cands, c
     memset(cand_seats, 0, num_cands * sizeof(uint32_t));
 
     for (uint32_t i = 0; i < num_votes; i++) {
-        orig_count[votes[i].cand]++;
+        orig_count[votes[i]]++;
     }
 
     memcpy(div_count, orig_count, num_cands * sizeof(double));
@@ -75,7 +75,7 @@ uint32_t* count_list_high_avg(electoral_system_t vote_sys, uint32_t num_cands, c
 }
 
 // count votes in a party list election using the largest remainder method
-uint32_t* count_list_large_rem(electoral_system_t vote_sys, uint32_t num_cands, counting_vote_t votes[], uint64_t num_votes) {
+uint32_t* count_list_large_rem(electoral_system_t vote_sys, uint32_t num_cands, min_vote_t votes[], uint64_t num_votes) {
     // hare quota
     // double quota = num_votes / vote_sys.winners;
     // droop quota
@@ -95,7 +95,7 @@ uint32_t* count_list_large_rem(electoral_system_t vote_sys, uint32_t num_cands, 
     memset(cand_seats, 0, num_cands * sizeof(uint32_t));
 
     for (uint32_t i = 0; i < num_votes; i++) {
-        count[votes[i].cand]++;
+        count[votes[i]]++;
     }
 
     for (uint32_t i = 0; i < num_cands; i++) {
@@ -134,6 +134,6 @@ uint32_t* count_list_large_rem(electoral_system_t vote_sys, uint32_t num_cands, 
 }
 
 // use whichever method for now
-uint32_t* count_list(electoral_system_t vote_sys, uint32_t num_cands, counting_vote_t votes[], uint64_t num_votes) {
+uint32_t* count_list(electoral_system_t vote_sys, uint32_t num_cands, min_vote_t votes[], uint64_t num_votes) {
     return count_list_high_avg(vote_sys, num_cands, votes, num_votes);
 }

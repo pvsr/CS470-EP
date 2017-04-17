@@ -294,6 +294,10 @@ uint32_t* count_stv(electoral_system_t vote_sys, uint32_t num_cands, full_vote_t
         for (uint32_t i = 0; i < num_cands; i++) {
             mpq_clear(count[i].count);
         }
+
+        for (uint32_t i = 0; i < total_votes; i++) {
+            mpq_clear(votes[i].value);
+        }
     }
 
     uint32_t result_idx = 0;
