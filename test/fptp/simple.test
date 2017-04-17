@@ -1,0 +1,2 @@
+echo $(../../votecounter ../../example_votefile -p) | diff simple.html -
+exit $?

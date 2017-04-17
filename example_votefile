@@ -32,21 +32,4 @@ c
 1 2,0,1
 !
 
-- v -- literal votes, mutually exclusive with counts
-- NOT YET IMPLEMENTED
-- cdp has 3 votes, ldp has 2, sdp has 4, and there are two preference votes
-v
-0
-0
-0
-1
-1
-2
-2
-2
-2
-2,0,1
-1,0
-!
-
-- one of c or v is required, and after either nothing more will be parsed
+- c is required, and after it nothing more will be parsed
