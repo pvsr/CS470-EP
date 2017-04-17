@@ -50,7 +50,7 @@ int main(int argc, char **argv) {
 
     if (debug) printf("voting system: %d-winner %s\n", vote_sys.winners, method_names[vote_sys.method]);
 
-    winners = count_votes(vote_sys, NULL, num_cands, votes, num_votes);
+    winners = count_votes(vote_sys, num_cands, votes, num_votes);
 
     if (vote_sys.method == FPTP || vote_sys.method == PREFERENTIAL) {
         if (cand_names == NULL) {
