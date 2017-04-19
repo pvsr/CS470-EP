@@ -3,6 +3,7 @@
 
 #include <gmp.h>
 #include <stdint.h>
+#include <stdbool.h>
 
 typedef enum voting_method {
     // plurality systems
@@ -19,6 +20,7 @@ typedef struct full_vote {
     uint32_t cur;
     uint32_t num_cands;
     mpq_t value;
+    bool exhausted;
 } full_vote_t;
 
 // a partial vote for counting, with the current candidate and value

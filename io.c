@@ -104,6 +104,7 @@ full_vote_t* parse_votes_count(FILE* f, char* str, uint32_t num_cands, uint64_t*
                 result[cur_vote].cands[k] = vote.cands[k];
             result[cur_vote].cur = 0;
             result[cur_vote].num_cands = vote.num_cands;
+            result[cur_vote].exhausted = false;
             assert(result[cur_vote].num_cands > 0);
         }
 

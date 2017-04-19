@@ -52,6 +52,10 @@ void reset_count(full_vote_t votes[], uint64_t total_votes, eliminated_t elimina
                 j = -1;
             }
         }
+
+        // vote is totally exhausted, i.e. only has prefs for excluded cands
+        if (votes[i].cur == votes[i].num_cands)
+            votes[i].exhausted = true;
     }
 }
 
@@ -123,6 +127,7 @@ void check_for_winners(uint64_t total_votes, count_t count[], uint32_t num_cands
             fputs("</tr>\n", output);
         }
 
+        if (debug) printf("end of round %d\n", round);
         round++;
     }
 }
@@ -134,6 +139,17 @@ void redistribute_surplus(full_vote_t votes[], uint32_t total_votes, count_t cou
     for (uint32_t i = 0; i < total_votes; i++) {
         bool won = false;
         uint32_t cand;
+
+        // exhausted votes
+        if (votes[i].cur >= votes[i].num_cands - 1) continue;
+        // TODO optional? Any ballot paper that does not express a valid
+        // preference for a continuing candidate greater than the preference
+        // allocated to the candidates whose surplus is to be distributed shall
+        // be set aside and declared exhausted-with-value and its value added to
+        // the total value of exhausted ballot papers recorded for the relevant
+        // transaction in the count. Exhausted votes that form part of a
+        // candidates surplus remain in the count and form part of the initial
+        // candidate’s Total Vote and surplus.
 
         // identify votes for winners
         for (uint32_t j = 0; j < eliminated_index; j++)
@@ -164,23 +180,10 @@ void redistribute_surplus(full_vote_t votes[], uint32_t total_votes, count_t cou
             }
         }
 
-        // exhausted votes
-        if (votes[i].cur >= votes[i].num_cands - 1) {
-            // TODO Any ballot paper that does not express a valid preference
-            // for a continuing candidate greater than the preference allocated
-            // to the candidates whose surplus is to be distributed shall be set
-            // aside and declared exhausted-with-value and its value added to
-            // the total value of exhausted ballot papers recorded for the
-            // relevant transaction in the count. Exhausted votes that form part
-            // of a candidates surplus remain in the count and form part of the
-            // initial candidate’s Total Vote and surplus.
-        }
-        else {
-            // reallocate votes
-            mpq_add(count[votes[i].cands[votes[i].cur]].count,
-                    count[votes[i].cands[votes[i].cur]].count, votes[i].value);
-            mpq_canonicalize(count[votes[i].cands[votes[i].cur]].count);
-        }
+        // reallocate votes
+        mpq_add(count[votes[i].cands[votes[i].cur]].count,
+                count[votes[i].cands[votes[i].cur]].count, votes[i].value);
+        mpq_canonicalize(count[votes[i].cands[votes[i].cur]].count);
     }
 }
 
@@ -223,7 +226,7 @@ uint32_t* count_stv(electoral_system_t vote_sys, uint32_t num_cands, full_vote_t
     uint32_t eliminated_index = 0;
     uint32_t remaining_winners = vote_sys.winners;
     mpq_t quota;
-    uint32_t num_valid_votes = total_votes;
+    uint64_t num_valid_votes = total_votes;
     uint32_t* result;
     count_t count[num_cands];
     uint64_t int_count[num_cands];
@@ -243,6 +246,11 @@ uint32_t* count_stv(electoral_system_t vote_sys, uint32_t num_cands, full_vote_t
 
         // initial distribution of preferences and calculation of quota
         for (uint32_t i = 0; i < total_votes; i++) {
+            if (votes[i].exhausted) {
+                num_valid_votes--;
+                continue;
+            }
+
             int_count[votes[i].cands[votes[i].cur]]++;
         }
 
@@ -277,7 +285,9 @@ uint32_t* count_stv(electoral_system_t vote_sys, uint32_t num_cands, full_vote_t
         current.index = find_min_count_t(count, num_cands, eliminated, eliminated_index);
         current.won = false;
         eliminated[eliminated_index] = current;
-        if (debug) printf("eliminated candidate %d\n", eliminated[eliminated_index].index);
+        if (debug) printf("eliminated candidate %d with %.2f votes\n",
+                eliminated[eliminated_index].index,
+                mpq_get_d(count[eliminated[eliminated_index].index].count));
         eliminated_index++;
 
         // number of seats remaining == number of candidates remaining?
