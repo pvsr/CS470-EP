@@ -83,7 +83,7 @@ uint32_t* count_votes(electoral_system_t vote_sys, uint32_t num_cands, full_vote
             cur_votes[i] = votes[i].cands[0];
         }
     }
-    else {
+    else if (vote_sys.method == STV) {
         for (uint64_t i = 0; i < num_votes; i++) {
             mpq_init(votes[i].value);
             mpq_set_ui(votes[i].value, 1, 1);
