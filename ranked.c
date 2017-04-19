@@ -373,7 +373,7 @@ void count_ranked_votes(full_vote_t votes[], uint64_t total_votes, uint64_t coun
 
         // exhausted votes are thrown away
         if (votes[i].cur >= votes[i].num_cands - 1) {
-            num_valid_votes--;
+            (*num_valid_votes)--;
             continue;
         }
 
