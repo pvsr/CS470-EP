@@ -1,0 +1,5 @@
+../../votecounter ../simple.vf -m stv -s 2 -p -o tmp.html
+diff simple_nonpref.html tmp.html
+rc=$?
+rm -f tmp.html
+exit $rc
