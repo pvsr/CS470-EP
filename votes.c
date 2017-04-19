@@ -84,9 +84,15 @@ uint32_t* count_votes(electoral_system_t vote_sys, uint32_t num_cands, full_vote
         }
     }
     else if (vote_sys.method == STV) {
-        for (uint64_t i = 0; i < num_votes; i++) {
-            mpq_init(votes[i].value);
-            mpq_set_ui(votes[i].value, 1, 1);
+        // single-winner stv is equivalent to irv
+        if (vote_sys.winners == 1) {
+            vote_sys.method = PREFERENTIAL;
+        }
+        else {
+            for (uint64_t i = 0; i < num_votes; i++) {
+                mpq_init(votes[i].value);
+                mpq_set_ui(votes[i].value, 1, 1);
+            }
         }
     }
 
