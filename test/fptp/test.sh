@@ -1,3 +1,4 @@
+#!/bin/sh
 for t in *.test; do
     ./"$t"
     rc=$?

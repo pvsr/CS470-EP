@@ -1,0 +1,5 @@
+../../votecounter nonpref.vf -m stv -s 7 -p -o tmp.html
+diff nonpref_high.html tmp.html
+rc=$?
+rm -f tmp.html
+exit $rc

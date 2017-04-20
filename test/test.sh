@@ -1,3 +1,4 @@
+#!/bin/sh
 for dir in */; do
     cd $dir
     ./test.sh | grep failed
