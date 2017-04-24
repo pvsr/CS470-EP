@@ -351,7 +351,7 @@ uint32_t* count_stv(electoral_system_t vote_sys, uint32_t num_cands, full_vote_t
     }
 
     for (uint32_t i = 0, j = 0; i < vote_sys.winners && j < eliminated_index; i++) {
-        if (eliminated[i].won)
+        if (eliminated[j].won)
             mpq_clear(eliminated[j++].votes);
     }
 
