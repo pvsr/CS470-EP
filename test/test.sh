@@ -1,5 +1,5 @@
 #!/bin/sh
-for dir in */; do
+for dir in fptp list preferential stv; do
     cd $dir
     ./test.sh | grep failed
     rc=$?

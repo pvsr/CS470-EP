@@ -1,5 +1,5 @@
-#ifndef _DEBUG_H_
-#define _DEBUG_H_
+#ifndef _OPTS_H_
+#define _OPTS_H_
 
 #include <stdbool.h>
 #include <stdio.h>

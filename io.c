@@ -162,21 +162,13 @@ uint32_t parse_candidates(FILE* f, char* str, char*** cand_names) {
     return num_cands;
 }
 
-full_vote_t* read_votefile(char* filename, electoral_system_t* vote_sys, char*** cand_names, uint32_t* num_cands, uint64_t* num_votes) {
+full_vote_t* read_votefile(FILE* f, electoral_system_t* vote_sys, char*** cand_names, uint32_t* num_cands, uint64_t* num_votes) {
     char str[MAX_LINE];
     char c;
     int i;
-    FILE* f;
 
     *num_cands = 0;
     *num_votes = 0;
-
-    f = fopen(filename, "r");
-
-    if (f == NULL) {
-        puts("nonexistent votefile");
-        exit(1);
-    }
 
     while (!feof(f)) {
         c = fgetc(f);
