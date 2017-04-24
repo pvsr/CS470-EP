@@ -3,9 +3,11 @@
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
+#include <mpi.h>
 
 #include "votes.h"
 #include "opts.h"
+#include "comms.h"
 
 void pretty_print_results(uint64_t count[], uint32_t cand_seats[], uint32_t num_cands, uint64_t num_votes, uint32_t num_seats) {
     fputs("<tr>\n<td>votes</td>\n", output);
@@ -38,19 +40,37 @@ uint32_t* count_list_high_avg(electoral_system_t vote_sys, uint32_t num_cands, m
     uint32_t winner;
     uint32_t remaining_seats = vote_sys.winners;
 
-    double orig_count[num_cands];
+    uint64_t orig_count[num_cands + 1];
     double div_count[num_cands];
     uint32_t* cand_seats;
     cand_seats = malloc(num_cands * sizeof(uint32_t));
     assert(cand_seats != NULL);
-    memset(orig_count, 0, num_cands * sizeof(double));
+    memset(orig_count, 0, num_cands * sizeof(uint64_t));
     memset(cand_seats, 0, num_cands * sizeof(uint32_t));
 
     for (uint32_t i = 0; i < num_votes; i++) {
         orig_count[votes[i]]++;
     }
 
-    memcpy(div_count, orig_count, num_cands * sizeof(double));
+    orig_count[num_cands] = num_votes;
+
+    if (num_procs > 1) {
+        if (pid == 0)
+        {
+            MPI_Reduce(MPI_IN_PLACE, orig_count, num_cands + 1, MPI_UNSIGNED_LONG,
+                       MPI_SUM, 0, MPI_COMM_WORLD);
+            num_votes = orig_count[num_cands];
+        }
+        else
+        {
+            MPI_Reduce(orig_count, NULL, num_cands + 1, MPI_UNSIGNED_LONG,
+                       MPI_SUM, 0, MPI_COMM_WORLD);
+            // the rest is cleanup
+            return NULL;
+        }
+    }
+
+    for (uint32_t i = 0; i < num_cands; i++) div_count[i] = orig_count[i];
 
     for (uint32_t i = 0; i < num_cands; i++) {
         if (100 * orig_count[i] / num_votes < vote_sys.threshold) div_count[i] = 0;
@@ -65,10 +85,7 @@ uint32_t* count_list_high_avg(electoral_system_t vote_sys, uint32_t num_cands, m
     }
 
     if (pretty) {
-        uint64_t int_count[num_cands];
-        for (uint32_t i = 0; i < num_cands; i++) int_count[i] = orig_count[i];
-
-        pretty_print_results(int_count, cand_seats, num_cands, num_votes, vote_sys.winners);
+        pretty_print_results(orig_count, cand_seats, num_cands, num_votes, vote_sys.winners);
     }
 
     return cand_seats;
