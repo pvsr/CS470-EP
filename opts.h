@@ -6,6 +6,7 @@
 
 extern bool debug;
 extern bool pretty;
+extern bool timing;
 
 extern FILE* output;
 

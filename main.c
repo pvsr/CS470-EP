@@ -17,6 +17,7 @@
 // initialize globals
 bool debug = false;
 bool pretty = false;
+bool timing = false;
 FILE* output;
 
 int pid = -1;
@@ -27,6 +28,7 @@ int main(int argc, char **argv) {
     char* input_file = NULL;
     char* output_file = NULL;
     char** cand_names = NULL;
+    double loc_input_time, input_time, loc_count_time, count_time;
     full_vote_t* votes;
     uint32_t num_cands;
     uint64_t num_votes;
@@ -52,6 +54,11 @@ int main(int argc, char **argv) {
 
     // only output to file on rank 0
     pretty = pretty && pid == 0;
+
+    if (timing) {
+        MPI_Barrier(MPI_COMM_WORLD);
+        loc_input_time = MPI_Wtime();
+    }
 
     if (input_file == NULL) {
         puts("no votefile provided!");
@@ -82,10 +89,15 @@ int main(int argc, char **argv) {
 
     if (f == NULL) {
         printf("rank %d: file does not exist\n", pid);
-        return 1;
+        MPI_Barrier(MPI_COMM_WORLD);
+        MPI_Barrier(MPI_COMM_WORLD);
+        MPI_Finalize();
+        return 0;
     }
 
     votes = read_votefile(f, &vote_sys, &cand_names, &num_cands, &num_votes);
+
+    if (timing) loc_input_time = MPI_Wtime() - loc_input_time;
 
     if (pretty) {
         if (output_file != NULL) output = fopen(output_file, "w");
@@ -103,9 +115,23 @@ int main(int argc, char **argv) {
 
     if (debug && pid == 0) printf("voting system: %d-winner %s\n", vote_sys.winners, method_names[vote_sys.method]);
 
+    if (timing) {
+        MPI_Barrier(MPI_COMM_WORLD);
+        loc_count_time = MPI_Wtime();
+    }
+
     winners = count_votes(vote_sys, num_cands, votes, num_votes);
 
+    if (timing) loc_count_time = MPI_Wtime() - loc_count_time;
+
+    MPI_Reduce(&loc_input_time, &input_time, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+    MPI_Reduce(&loc_count_time, &count_time, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+
     if (pid != 0) goto end;
+
+    if (timing) {
+        printf("input: %.4f  count: %.4f\n", (float)input_time, (float)count_time);
+    }
 
     if (vote_sys.method == FPTP || vote_sys.method == PREFERENTIAL) {
         if (cand_names == NULL) {

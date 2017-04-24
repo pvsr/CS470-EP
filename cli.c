@@ -12,6 +12,7 @@ void print_help_message() {
     puts("Usage: votecounter [OPTION]... VOTEFILE\n"
          "Options:\n"
          "  -h --help               display this help message\n"
+         "  -T --timing             print timing information\n"
          "  -m --votemethod=METHOD  voting system (fptp, list, etc.)\n"
          "  -s --seats=NUM          number of seats in multiwinner systems\n"
          "  -t --threshold=NUM      percent threshold to win a seat in list-pr (default 3)\n"
@@ -29,6 +30,7 @@ int parse_command_line(int argc, char** argv, char** vote_file, char** output_fi
     while (true) {
         static struct option long_options[] = {
             {"help", no_argument, 0, 'h'},
+            {"timing", no_argument, 0, 'T'},
             {"votemethod", required_argument, 0, 'v'},
             {"seats", required_argument, 0, 's'},
             {"threshold", required_argument, 0, 't'},
@@ -40,7 +42,7 @@ int parse_command_line(int argc, char** argv, char** vote_file, char** output_fi
 
         int option_index = 0;
 
-        opt = getopt_long(argc, argv, "hm:s:t:dpo:", long_options, &option_index);
+        opt = getopt_long(argc, argv, "hTm:s:t:dpo:", long_options, &option_index);
 
         if (opt == -1) break;
 
@@ -66,6 +68,9 @@ int parse_command_line(int argc, char** argv, char** vote_file, char** output_fi
                 break;
             case 'd':
                 debug = true;
+                break;
+            case 'T':
+                timing = true;
                 break;
             case 'p':
                 pretty = true;
