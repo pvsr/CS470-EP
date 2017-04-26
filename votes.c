@@ -6,7 +6,8 @@
 #include "votes.h"
 #include "opts.h"
 #include "listpr.h"
-#include "ranked.h"
+#include "stv.h"
+#include "irv.h"
 #include "fptp.h"
 
 uint32_t find_max_dbl(double count[], uint32_t num_cands) {
