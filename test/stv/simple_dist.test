@@ -1,0 +1,5 @@
+salloc -Q -n 4 mpirun ../../votecounter ../simple_pref_dist -m stv -s 2 -p -o tmp.html
+diff simple.html tmp.html
+rc=$?
+rm -f tmp.html
+exit $rc

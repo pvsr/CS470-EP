@@ -1,0 +1,5 @@
+salloc -Q -n 10 mpirun ../../votecounter ../large -m stv -s 4 -p -o tmp.html
+diff large.html tmp.html
+rc=$?
+rm -f tmp.html
+exit $rc

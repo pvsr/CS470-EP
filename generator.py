@@ -27,6 +27,7 @@ if args.pref:
     votes = itertools.permutations(range(0, args.cands))
     for vote in votes:
         num_votes = random.randrange(args.min, args.max)
+        if num_votes <= 0: continue
         file.write('{0} '.format(num_votes))
         for cand in vote[:-1]:
             file.write('{0},'.format(cand))
