@@ -14,6 +14,7 @@
 #define EXPAND2(x) #x
 #define EXPAND(X) EXPAND2(X)
 
+// parse a string into a vote system
 voting_method_t parse_vote_sys(char* string) {
     if (strcmp("fptp", string) == 0) {
         return FPTP;
@@ -33,6 +34,7 @@ voting_method_t parse_vote_sys(char* string) {
     }
 }
 
+// parse the vote_count section
 full_vote_t* parse_votes_count(FILE* f, char* str, uint32_t num_cands, uint64_t* num_votes) {
     char* tmp;
     int i;
@@ -117,8 +119,7 @@ full_vote_t* parse_votes_count(FILE* f, char* str, uint32_t num_cands, uint64_t*
     return result;
 }
 
-full_vote_t* parse_votes_list(FILE* f, char* str, uint32_t num_cands, uint32_t* num_votes);
-
+// parse a list of candidates
 uint32_t parse_candidates(FILE* f, char* str, char*** cand_names) {
     char c;
     char** names;
@@ -162,6 +163,7 @@ uint32_t parse_candidates(FILE* f, char* str, char*** cand_names) {
     return num_cands;
 }
 
+// parse a votefile
 full_vote_t* read_votefile(FILE* f, electoral_system_t* vote_sys, char*** cand_names, uint32_t* num_cands, uint64_t* num_votes) {
     char str[MAX_LINE];
     char c;
@@ -210,8 +212,6 @@ full_vote_t* read_votefile(FILE* f, electoral_system_t* vote_sys, char*** cand_n
                 break;
             case 'c':
                 return parse_votes_count(f, str, *num_cands, num_votes);
-            case 'v':
-                // return parse_votes_list(f, str, *num_cands, num_votes);
             case '\n':
             case ' ':
             default:

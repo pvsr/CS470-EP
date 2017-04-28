@@ -23,6 +23,7 @@ uint32_t find_min_int(uint64_t count[], uint32_t num_cands) {
     return min_index;
 }
 
+// reallocate and recount votes at the end of a round
 void count_ranked_votes(full_vote_t votes[], uint64_t total_votes, uint64_t count[], uint64_t* num_valid_votes, uint32_t losers[], uint32_t loser_index) {
     for (uint32_t i = 0; i < total_votes; i++) {
         // skip non-losers
@@ -50,6 +51,7 @@ void count_ranked_votes(full_vote_t votes[], uint64_t total_votes, uint64_t coun
     }
 }
 
+// count votes in an irv election
 uint32_t* count_irv(uint32_t num_cands, full_vote_t votes[], uint64_t total_votes) {
     int round = 1;
     int64_t current;

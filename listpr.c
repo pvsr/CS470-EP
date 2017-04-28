@@ -92,6 +92,7 @@ uint32_t* count_list_high_avg(electoral_system_t vote_sys, uint32_t num_cands, m
 }
 
 // count votes in a party list election using the largest remainder method
+// out of data and not distributed. only left in as an example of another method
 uint32_t* count_list_large_rem(electoral_system_t vote_sys, uint32_t num_cands, min_vote_t votes[], uint64_t num_votes) {
     // hare quota
     // double quota = num_votes / vote_sys.winners;

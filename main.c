@@ -14,7 +14,7 @@
 
 #define CSS "table,th,td {border: 1px solid black;} table {border-collapse: collapse;} th,td {padding: 15px; text-align: center;}"
 
-// initialize globals
+// declare globals
 bool debug = false;
 bool pretty = false;
 bool timing = false;
@@ -33,16 +33,11 @@ int main(int argc, char **argv) {
     uint32_t num_cands;
     uint64_t num_votes;
     uint32_t* winners;
-    int provided;
     struct stat file;
     FILE* f;
     electoral_system_t vote_sys;
 
-    MPI_Init_thread(NULL, NULL, MPI_THREAD_MULTIPLE, &provided);
-    if (provided != MPI_THREAD_MULTIPLE) {
-        puts("ERROR: Cannot initialize MPI in THREAD_MULTIPLE mode.");
-        exit(EXIT_FAILURE);
-    }
+    MPI_Init(&argc, &argv);
 
     MPI_Comm_rank(MPI_COMM_WORLD, &pid);
     MPI_Comm_size(MPI_COMM_WORLD, &num_procs);
@@ -52,8 +47,9 @@ int main(int argc, char **argv) {
     vote_sys = (electoral_system_t){FPTP, 1, 3};
     assert(parse_command_line(argc, argv, &input_file, &output_file, &vote_sys) == 0);
 
-    // only output to file on rank 0
+    // only output these rank 0
     pretty = pretty && pid == 0;
+    timing = timing && pid == 0;
 
     if (timing) {
         MPI_Barrier(MPI_COMM_WORLD);
@@ -65,16 +61,16 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    // input is a file, not a directory
     if (stat(input_file, &file) != 0) {
         if (pid == 0) puts("input file does not exist");
         return 1;
     }
 
+    // input is a file, not a directory
     if (!S_ISDIR(file.st_mode)) {
-        if (pid != 0) {
-            if (debug) printf("rank %d exiting\n", pid);
-            return 0;
+        if (num_procs > 1) {
+            if (debug) puts("expected directory");
+            return 1;
         }
 
         f = fopen(input_file, "r");
@@ -89,10 +85,7 @@ int main(int argc, char **argv) {
 
     if (f == NULL) {
         printf("rank %d: file does not exist\n", pid);
-        MPI_Barrier(MPI_COMM_WORLD);
-        MPI_Barrier(MPI_COMM_WORLD);
-        MPI_Finalize();
-        return 0;
+        return 1;
     }
 
     votes = read_votefile(f, &vote_sys, &cand_names, &num_cands, &num_votes);

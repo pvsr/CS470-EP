@@ -12,6 +12,7 @@
 
 static int round = 1;
 
+// comparison function for quicksort
 int cmp_eliminated (const void* a, const void* b) {
     eliminated_t *ae, *be;
     ae = (eliminated_t*)a;
@@ -26,6 +27,7 @@ int cmp_eliminated (const void* a, const void* b) {
     else return 0;
 }
 
+// reset variables for new round
 void reset_count(full_vote_t votes[], uint64_t total_votes, eliminated_t eliminated[], uint32_t* eliminated_index) {
     // clear provisional winners
     for (uint32_t j = 0; j < *eliminated_index; j++)
@@ -137,6 +139,7 @@ void check_for_winners(uint64_t total_votes, count_t count[], uint32_t num_cands
     }
 }
 
+// redistribute surplus votes
 void redistribute_surplus(full_vote_t votes[], uint32_t total_votes, count_t count[], eliminated_t eliminated[], uint32_t eliminated_index) {
     // loop through every vote to find votes to reassign
     // note that we are only reassigning winners right now
@@ -147,7 +150,7 @@ void redistribute_surplus(full_vote_t votes[], uint32_t total_votes, count_t cou
 
         // exhausted votes
         if (votes[i].cur >= votes[i].num_cands - 1) continue;
-        // TODO optional? Any ballot paper that does not express a valid
+        // TODO (optional) Any ballot paper that does not express a valid
         // preference for a continuing candidate greater than the preference
         // allocated to the candidates whose surplus is to be distributed shall
         // be set aside and declared exhausted-with-value and its value added to
@@ -192,6 +195,7 @@ void redistribute_surplus(full_vote_t votes[], uint32_t total_votes, count_t cou
     }
 }
 
+// redistribute and recount after a winner is found
 void handle_surplus(full_vote_t votes[], uint64_t total_votes, uint32_t num_cands, count_t count[], eliminated_t eliminated[], uint32_t eliminated_index, mpq_t quota) {
     if (eliminated_index > 1) {
         qsort(eliminated, eliminated_index, sizeof(eliminated_t), cmp_eliminated);
@@ -223,6 +227,7 @@ void handle_surplus(full_vote_t votes[], uint64_t total_votes, uint32_t num_cand
     }
 }
 
+// count votes in an stv election
 uint32_t* count_stv(electoral_system_t vote_sys, uint32_t num_cands, full_vote_t votes[], uint64_t local_votes) {
     if (vote_sys.winners > num_cands) {
         puts("The number of available seats must be less than the number of candidates!");
@@ -276,6 +281,8 @@ uint32_t* count_stv(electoral_system_t vote_sys, uint32_t num_cands, full_vote_t
         int_count[int_count_len - 1] = num_valid_votes;
 
         if (num_procs > 1) {
+            // allreduce means more communication upfront for less later (e.g.
+            // quota calculation, etc.)
             MPI_Allreduce(MPI_IN_PLACE, int_count, int_count_len,
                     MPI_UNSIGNED_LONG, MPI_SUM, MPI_COMM_WORLD);
 
@@ -331,7 +338,7 @@ uint32_t* count_stv(electoral_system_t vote_sys, uint32_t num_cands, full_vote_t
                     transfer_count[i] = mpq_get_d(tmp_global_count[i].count);
                 }
 
-                // some loss of precision is invevitable
+                // some loss of precision is inevitable
                 MPI_Allreduce(MPI_IN_PLACE, transfer_count, num_cands,
                         MPI_LONG_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
 
