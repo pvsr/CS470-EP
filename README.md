@@ -1,4 +1,5 @@
 ## Listing/description of files
+* report: final report
 * README.md: this file
 * PROPOSAL.md: the original project proposal
 * NOTES.md: some notes on vote-counting algorithms
